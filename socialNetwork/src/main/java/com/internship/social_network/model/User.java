@@ -1,15 +1,24 @@
-package com.internship.socialNetwork.model;
+package com.internship.social_network.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
-@ToString
+@Data
 @Entity
 @Table(name = "users")
 public class User {
@@ -41,10 +50,10 @@ public class User {
     )
     private List<User> friends;
 
-    @OneToMany(mappedBy = "fromUser")
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL)
     private List<FriendRequest> sentFriendRequests;
 
-    @OneToMany(mappedBy = "toUser")
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL)
     private List<FriendRequest> receivedFriendRequests;
 
     @OneToMany(mappedBy = "commentedBy", cascade = CascadeType.ALL)

@@ -1,4 +1,4 @@
-package com.internship.socialNetwork;
+package com.internship.social_network;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
