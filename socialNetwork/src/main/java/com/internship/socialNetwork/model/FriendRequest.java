@@ -1,8 +1,8 @@
-package model;
+package com.internship.socialNetwork.model;
 
+import com.internship.socialNetwork.model.enumeration.FriendRequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import model.enumeration.FriendRequestStatus;
 
 @NoArgsConstructor
 @AllArgsConstructor

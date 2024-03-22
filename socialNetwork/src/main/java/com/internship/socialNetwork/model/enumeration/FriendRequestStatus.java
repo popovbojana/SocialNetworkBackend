@@ -1,4 +1,4 @@
-package model.enumeration;
+package com.internship.socialNetwork.model.enumeration;
 
 public enum FriendRequestStatus {
     PENDING,

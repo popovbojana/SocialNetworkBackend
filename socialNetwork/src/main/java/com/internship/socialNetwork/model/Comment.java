@@ -1,4 +1,4 @@
-package model;
+package com.internship.socialNetwork.model;
 
 import jakarta.persistence.*;
 import lombok.*;
