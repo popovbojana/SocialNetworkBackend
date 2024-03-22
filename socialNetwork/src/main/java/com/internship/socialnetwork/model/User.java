@@ -1,4 +1,4 @@
-package com.internship.social_network.model;
+package com.internship.socialnetwork.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -41,14 +41,6 @@ public class User {
 
     @OneToMany(mappedBy = "postedBy", cascade = CascadeType.ALL)
     private List<Post> posts;
-
-    @ManyToMany
-    @JoinTable(
-            name = "friendships",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id")
-    )
-    private List<User> friends;
 
     @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL)
     private List<FriendRequest> sentFriendRequests;
