@@ -14,16 +14,30 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String TIMESTAMP = "timestamp";
+
+    private static final String STATUS = "status";
+
+    private static final String ERROR = "error";
+
+    private static final String MESSAGE = "message";
+
+    private static final String PATH = "path";
+
+    private static final String BAD_REQUEST_MESSAGE = "Bad Request";
+
+    private static final String NOT_FOUND_MESSAGE = "Not Found";
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException ex, WebRequest request) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
-        errorResponse.put("error", "Bad Request");
-        errorResponse.put("message", ex.getMessage());
-        errorResponse.put("path", request.getDescription(false));
+        errorResponse.put(TIMESTAMP, LocalDateTime.now());
+        errorResponse.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        errorResponse.put(ERROR, BAD_REQUEST_MESSAGE);
+        errorResponse.put(MESSAGE, ex.getMessage());
+        errorResponse.put(PATH, request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -37,4 +51,16 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> handleNotFoundException(NotFoundException ex, WebRequest request) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put(TIMESTAMP, LocalDateTime.now());
+        errorResponse.put(STATUS, HttpStatus.NOT_FOUND.value());
+        errorResponse.put(ERROR, NOT_FOUND_MESSAGE);
+        errorResponse.put(MESSAGE, ex.getMessage());
+        errorResponse.put(PATH, request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
 }

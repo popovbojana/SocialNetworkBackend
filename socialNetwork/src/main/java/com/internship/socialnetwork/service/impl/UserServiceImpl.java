@@ -8,6 +8,9 @@ import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.internship.socialnetwork.dto.NewUserDTO.toUser;
+import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
+
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,9 +18,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDTO addNewUser(NewUserDTO newUserDTO) {
+    public UserDTO create(NewUserDTO newUserDTO) {
         checkIfUserExists(newUserDTO);
-        return UserDTO.mapToResponse(userRepository.save(NewUserDTO.mapToUser(newUserDTO)));
+        return toUserDTO(userRepository.save(toUser(newUserDTO)));
     }
 
     private void checkIfUserExists(NewUserDTO newUserDTO) {

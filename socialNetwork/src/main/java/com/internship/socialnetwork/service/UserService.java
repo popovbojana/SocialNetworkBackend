@@ -5,6 +5,6 @@ import com.internship.socialnetwork.dto.NewUserDTO;
 
 public interface UserService {
 
-    UserDTO addNewUser(NewUserDTO newUser);
+    UserDTO create(NewUserDTO newUser);
 
 }

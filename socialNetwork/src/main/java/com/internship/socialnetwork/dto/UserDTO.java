@@ -22,7 +22,7 @@ public class UserDTO {
 
     private String phoneNumber;
 
-    public static UserDTO mapToResponse(User user) {
+    public static UserDTO toUserDTO(User user) {
         return UserDTO.builder()
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
