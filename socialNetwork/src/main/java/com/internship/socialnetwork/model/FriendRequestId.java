@@ -18,4 +18,5 @@ public class FriendRequestId implements Serializable {
     private Long fromUser;
 
     private Long toUser;
+
 }

@@ -8,6 +8,7 @@ import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.PostRepository;
 import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.PostService;
+import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +23,13 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
 
-    private final UserRepository userRepository;
-
-    private static final String USER_NOT_FOUND_MESSAGE = "User with id %s doesn't exist!";
+    private final UserService userService;
 
     private static final String POST_NOT_FOUND_MESSAGE = "Post with id %s doesn't exist!";
 
     @Override
     public PostDTO create(Long userId, NewPostDTO newPostDTO) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userId)));
+        User user = userService.findById(userId);
         return toPostDTO(postRepository.save(toPost(user, newPostDTO)));
     }
 

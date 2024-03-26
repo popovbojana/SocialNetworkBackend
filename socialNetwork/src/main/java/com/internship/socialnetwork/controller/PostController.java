@@ -47,7 +47,7 @@ public class PostController {
     }
 
     @DeleteMapping(value = "posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         postService.delete(postId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
