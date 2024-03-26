@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,27 +15,36 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    private final HttpServletRequest request;
+
+    public GlobalExceptionHandler(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleNotFoundException(NotFoundException exception) {
+        return createResponseEntity(createErrorMessage(exception, HttpStatus.NOT_FOUND));
+    }
+
     @ExceptionHandler(BadRequestException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException ex, WebRequest request) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
-        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
-        errorResponse.put("error", "Bad Request");
-        errorResponse.put("message", ex.getMessage());
-        errorResponse.put("path", request.getDescription(false));
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorMessage> handleBadRequestException(BadRequestException exception) {
+        return createResponseEntity(createErrorMessage(exception, HttpStatus.BAD_REQUEST));
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            errors.put(((FieldError) error).getField(), error.getDefaultMessage());
-        });
-        return errors;
+    public ResponseEntity<ErrorMessage> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return handleBadRequestException(new BadRequestException("Validation error"));
     }
 
+    private ResponseEntity<ErrorMessage> createResponseEntity(ErrorMessage errorMessage) {
+        return new ResponseEntity<>(errorMessage, errorMessage.getHttpStatus());
+    }
+
+    private ErrorMessage createErrorMessage(AbstractException exception, HttpStatus httpStatus) {
+        return new ErrorMessage(exception, httpStatus, getPath(request));
+    }
+
+    private String getPath(HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 }

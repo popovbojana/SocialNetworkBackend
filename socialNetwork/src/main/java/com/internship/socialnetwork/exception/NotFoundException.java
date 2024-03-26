@@ -3,17 +3,17 @@ package com.internship.socialnetwork.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class BadRequestException extends AbstractException {
+public class NotFoundException extends AbstractException {
 
-    public BadRequestException(String message) {
+    public NotFoundException(String message) {
         super(message);
     }
 
-    public BadRequestException(String message, Throwable cause) {
+    public NotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public BadRequestException(Throwable cause) {
+    public NotFoundException(Throwable cause) {
         super(cause);
     }
 
