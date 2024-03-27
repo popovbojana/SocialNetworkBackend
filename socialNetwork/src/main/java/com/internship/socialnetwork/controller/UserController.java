@@ -20,8 +20,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> registerNewUser(@Valid @RequestBody NewUserDTO newUser) {
-        return new ResponseEntity<>(userService.addNewUser(newUser), HttpStatus.CREATED);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody NewUserDTO newUser) {
+        return new ResponseEntity<>(userService.create(newUser), HttpStatus.CREATED);
     }
 }
