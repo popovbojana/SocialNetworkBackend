@@ -37,7 +37,7 @@ class UserServiceImplTest {
     private final Long USER_ID = 1L;
 
     @Test
-    void shouldAddNewUser() {
+    void shouldSaveUser_whenCreateUser_ifUserDoesntExist() {
         // given
         NewUserDTO newUserDTO = NewUserDTO.builder()
                 .email("Test email")
@@ -71,7 +71,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenAddNewUser_ifUserWithEmailExists() {
+    void shouldThrowBadRequestException_whenCreateUser_ifUserWithEmailExists() {
         // given
         String email = "test@email.com";
 
@@ -99,7 +99,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenAddNewUser_ifUserWithUsernameExists() {
+    void shouldThrowBadRequestException_whenCreateUser_ifUserWithUsernameExists() {
         // given
         String username = "test_username";
 
@@ -127,7 +127,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldGetAllFriendsById() {
+    void shouldReturnAllFriends_whenGetAllFriendsByUserId_ifUserExists() {
         // given
         User user = User.builder().id(USER_ID).build();
 
@@ -148,7 +148,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldFindUserById() {
+    void shouldReturnUser_whenFindUserById_ifUserExists() {
         // given
         User user = User.builder().id(USER_ID).build();
 

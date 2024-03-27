@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
 @Entity
 @Table(name = "friend_requests")

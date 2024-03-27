@@ -6,7 +6,6 @@ import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.Post;
 import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.PostRepository;
-import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.PostService;
 import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,8 @@ import java.util.List;
 import static com.internship.socialnetwork.dto.NewPostDTO.toPost;
 import static com.internship.socialnetwork.dto.PostDTO.toPostDTO;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
@@ -42,21 +41,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO get(Long postId) {
-        return toPostDTO(postRepository.findById(postId).orElseThrow(() -> new NotFoundException(String.format(POST_NOT_FOUND_MESSAGE, postId))));
+    public PostDTO get(Long id) {
+        return toPostDTO(findById(id));
     }
 
     @Override
-    public PostDTO update(Long postId, NewPostDTO updatedPost) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException(String.format(POST_NOT_FOUND_MESSAGE, postId)));
+    public PostDTO update(Long id, NewPostDTO updatedPost) {
+        Post post = findById(id);
         post.setDescription(updatedPost.getDescription());
         post.setMedia(updatedPost.getMedia());
         return toPostDTO(postRepository.save(post));
     }
 
     @Override
-    public void delete(Long postId) {
-        postRepository.delete(postRepository.findById(postId).orElseThrow(() -> new NotFoundException(String.format(POST_NOT_FOUND_MESSAGE, postId))));
+    public void delete(Long id) {
+        postRepository.delete(findById(id));
+    }
+
+    @Override
+    public Post findById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(POST_NOT_FOUND_MESSAGE, id)));
     }
 
 }

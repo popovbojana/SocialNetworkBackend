@@ -1,7 +1,10 @@
 package com.internship.socialnetwork.controller;
 
+import com.internship.socialnetwork.dto.CommentDTO;
+import com.internship.socialnetwork.dto.NewCommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
+import com.internship.socialnetwork.service.CommentService;
 import com.internship.socialnetwork.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,39 +20,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/posts")
 public class PostController {
 
     private final PostService postService;
 
-    @PostMapping(value = "users/{userId}/posts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PostDTO> create(@PathVariable Long userId, @Valid @RequestBody NewPostDTO newPostDTO) {
-        return new ResponseEntity<>(postService.create(userId, newPostDTO), HttpStatus.CREATED);
-    }
+    private final CommentService commentService;
 
-    @GetMapping(value = "users/{userId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PostDTO>> getAllForUser(@PathVariable Long userId) {
-        return new ResponseEntity<>(postService.getAllForUser(userId), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "posts/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
     public ResponseEntity<PostDTO> get(@PathVariable Long id) {
         return new ResponseEntity<>(postService.get(id), HttpStatus.OK);
     }
 
-    @PutMapping(value = "posts/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PostDTO> update(@PathVariable Long postId, @Valid @RequestBody NewPostDTO updatedPost) {
-        return new ResponseEntity<>(postService.update(postId, updatedPost), HttpStatus.OK);
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<PostDTO> update(@PathVariable Long id, @Valid @RequestBody NewPostDTO updatedPost) {
+        return new ResponseEntity<>(postService.update(id, updatedPost), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.delete(postId);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        postService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping(value = "/{id}/comments")
+    public ResponseEntity<CommentDTO> create(@PathVariable Long id, @Valid @RequestBody NewCommentDTO newCommentDTO) {
+        return new ResponseEntity<>(commentService.create(id, newCommentDTO), HttpStatus.CREATED);
     }
 
 }

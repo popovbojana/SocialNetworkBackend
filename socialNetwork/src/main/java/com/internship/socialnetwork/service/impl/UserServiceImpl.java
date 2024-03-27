@@ -15,8 +15,8 @@ import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User with id %s doesn't exist!", id)));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %s doesn't exist!", id)));
     }
 
     private void checkIfUserExists(NewUserDTO newUserDTO) {
