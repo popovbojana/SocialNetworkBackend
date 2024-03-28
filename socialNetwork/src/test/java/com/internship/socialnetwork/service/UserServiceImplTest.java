@@ -3,6 +3,7 @@ package com.internship.socialnetwork.service;
 import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
+import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.impl.UserServiceImpl;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +33,8 @@ class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    private final Long USER_ID = 1L;
 
     @Test
     void shouldAddNewUser() {
@@ -120,6 +124,61 @@ class UserServiceImplTest {
         // and
         verify(userRepository).findByUsername(any());
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldGetAllFriendsById() {
+        // given
+        User user = User.builder().id(USER_ID).build();
+
+        Long friendId = 2L;
+        User friend = User.builder().id(friendId).build();
+        UserDTO friendDTO = UserDTO.toUserDTO(user);
+
+        when(userRepository.findFriendsById(any())).thenReturn(List.of(friend));
+
+        // when
+        List<UserDTO> foundFriends = userService.getAllFriendsById(USER_ID);
+
+        // then
+        assertEquals(List.of(friendDTO), foundFriends);
+
+        // and
+        verify(userRepository).findFriendsById(any());
+    }
+
+    @Test
+    void shouldFindUserById() {
+        // given
+        User user = User.builder().id(USER_ID).build();
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+
+        // when
+        User foundUser = userService.findById(USER_ID);
+
+        // then
+        assertEquals(user, foundUser);
+
+        // and
+        verify(userRepository).findById(any());
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenFindUserById_ifUserWithIdDoesntExist() {
+        // given
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
+
+        // when
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
+            userService.findById(USER_ID);
+        });
+
+        // then
+        assertEquals("User with id 1 doesn't exist!", exception.getMessage());
+
+        // and
+        verify(userRepository).findById(any());
     }
 
 }

@@ -6,8 +6,8 @@ import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.Post;
 import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.PostRepository;
-import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.impl.PostServiceImpl;
+import com.internship.socialnetwork.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceImplTest {
@@ -31,22 +33,22 @@ class PostServiceImplTest {
     private PostRepository postRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserServiceImpl userService;
 
     @InjectMocks
     private PostServiceImpl postService;
 
-    private final String TEST_DESCRIPTION = "Test description";
+    private static final String TEST_DESCRIPTION = "Test description";
 
-    private final String TEST_MEDIA = "Test media";
+    private static final String TEST_MEDIA = "Test media";
 
-    private final Long USER_ID = 1L;
+    private static final Long USER_ID = 1L;
 
-    private final Long POST_ID = 1L;
+    private static final Long POST_ID = 1L;
 
-    private final String NOT_FOUND_USER_MESSAGE = "User with id 1 doesn't exist!";
+    private static final String NOT_FOUND_USER_MESSAGE = "User with id 1 doesn't exist!";
     
-    private final String NOT_FOUND_POST_MESSAGE = "Post with id 1 doesn't exist!";
+    private static final String NOT_FOUND_POST_MESSAGE = "Post with id 1 doesn't exist!";
 
     @Test
     void shouldCreatePost() {
@@ -64,7 +66,7 @@ class PostServiceImplTest {
 
         PostDTO postDTO = createPostDTO(USER_ID, TEST_DESCRIPTION, TEST_MEDIA, createdAt);
 
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userService.findById(any())).thenReturn(user);
         when(postRepository.save(any())).thenReturn(post);
 
         // when
@@ -74,7 +76,7 @@ class PostServiceImplTest {
         assertEquals(postDTO, savedPost);
 
         // and
-        verify(userRepository).findById(any());
+        verify(userService).findById(any());
         verify(postRepository).save(any());
     }
 
@@ -86,7 +88,7 @@ class PostServiceImplTest {
                 .media(TEST_MEDIA)
                 .build();
 
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userService.findById(any())).thenThrow(new NotFoundException(NOT_FOUND_USER_MESSAGE));
 
         // when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
@@ -97,7 +99,7 @@ class PostServiceImplTest {
         assertEquals(NOT_FOUND_USER_MESSAGE, exception.getMessage());
 
         // and
-        verify(userRepository).findById(any());
+        verify(userService).findById(any());
         verify(postRepository, never()).save(any());
     }
 
