@@ -14,4 +14,11 @@ public interface UserService {
 
     User findById(Long id);
 
+    UserDTO get(Long id);
+
+    UserDTO update(Long id, NewUserDTO updatedUser);
+
+    void delete(Long id);
+
+    List<UserDTO> search(String username, String firstName, String lastName);
 }

@@ -1,6 +1,7 @@
 package com.internship.socialnetwork.service;
 
 import com.internship.socialnetwork.dto.FriendRequestDTO;
+import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
 import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.FriendRequest;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,12 @@ import static org.mockito.Mockito.never;
 @ExtendWith(MockitoExtension.class)
 class FriendRequestServiceImplTest {
 
+    private static final Long USER_ID = 1L;
+
+    private static final Long OTHER_USER_ID = 2L;
+
+    private static final String FRIEND_REQUEST_NOT_FOUND_MESSAGE = "Friend request between users 1 and 2 doesn't exist!";
+
     @Mock
     private FriendRequestRepository friendRequestRepository;
 
@@ -39,12 +47,6 @@ class FriendRequestServiceImplTest {
 
     @InjectMocks
     private FriendRequestServiceImpl friendRequestService;
-
-    private static final Long USER_ID = 1L;
-
-    private static final Long OTHER_USER_ID = 2L;
-
-    private static final String FRIEND_REQUEST_NOT_FOUND_MESSAGE = "Friend request between users 1 and 2 doesn't exist!";
 
     @Test
     void shouldCreateRequest() {
@@ -93,6 +95,29 @@ class FriendRequestServiceImplTest {
         // and
         verify(userService, atLeastOnce()).findById(any());
         verify(friendRequestRepository).findById(any());
+        verify(friendRequestRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowBadRequestException_whenCreateRequest_ifLimitIsReached() {
+        // given
+        User user = createUser(USER_ID);
+        List<UserDTO> friends = List.of(new UserDTO(), new UserDTO());
+
+        when(userService.findById(USER_ID)).thenReturn(user);
+        when(userService.getAllFriendsById(USER_ID)).thenReturn(friends);
+
+        // when
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            friendRequestService.create(USER_ID, OTHER_USER_ID);
+        });
+
+        // then
+        assertEquals("Maximum number of friends limit reached.", exception.getMessage());
+
+        // and
+        verify(userService).findById(any());
+        verify(userService).getAllFriendsById(any());
         verify(friendRequestRepository, never()).save(any());
     }
 

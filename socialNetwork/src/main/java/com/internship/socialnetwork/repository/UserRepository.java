@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND user.id != :id")
     List<User> findFriendsById(Long id);
 
+    List<User> findByUsernameOrFirstNameOrLastName(String username, String firstName, String lastName);
+
 }

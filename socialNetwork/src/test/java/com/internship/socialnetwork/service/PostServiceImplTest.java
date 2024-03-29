@@ -29,15 +29,6 @@ import static org.mockito.Mockito.never;
 @ExtendWith(MockitoExtension.class)
 class PostServiceImplTest {
 
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private UserServiceImpl userService;
-
-    @InjectMocks
-    private PostServiceImpl postService;
-
     private static final String TEST_DESCRIPTION = "Test description";
 
     private static final String TEST_MEDIA = "Test media";
@@ -47,8 +38,17 @@ class PostServiceImplTest {
     private static final Long POST_ID = 1L;
 
     private static final String NOT_FOUND_USER_MESSAGE = "User with id 1 doesn't exist!";
-    
+
     private static final String NOT_FOUND_POST_MESSAGE = "Post with id 1 doesn't exist!";
+
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private UserServiceImpl userService;
+
+    @InjectMocks
+    private PostServiceImpl postService;
 
     @Test
     void shouldCreatePost() {
