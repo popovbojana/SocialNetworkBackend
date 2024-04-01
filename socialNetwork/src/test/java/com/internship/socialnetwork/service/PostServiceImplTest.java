@@ -1,8 +1,10 @@
 package com.internship.socialnetwork.service;
 
+import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.exception.NotFoundException;
+import com.internship.socialnetwork.model.Comment;
 import com.internship.socialnetwork.model.Post;
 import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.PostRepository;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.internship.socialnetwork.dto.CommentDTO.toCommentDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,7 +54,7 @@ class PostServiceImplTest {
     private PostServiceImpl postService;
 
     @Test
-    void shouldSavePost_whenCreatePost_ifUserExists() {
+    void shouldReturnPost_whenCreate_ifUserExists() {
         // given
         LocalDateTime createdAt = LocalDateTime.now();
 
@@ -81,7 +84,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenCreatePost_ifUserDoesntExist() {
+    void shouldThrowNotFoundException_whenCreate_ifUserDoesntExist() {
         // given
         NewPostDTO newPostDTO = NewPostDTO.builder()
                 .description(TEST_DESCRIPTION)
@@ -104,7 +107,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldReturnAllPosts_whenGetAllPostsForUser_ifUserExists() {
+    void shouldReturnAllPosts_whenGetAllForUser_ifUserExists() {
         // given
         LocalDateTime createdAt = LocalDateTime.now();
 
@@ -132,7 +135,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldReturnPost_whenGetPost_ifPostExists() {
+    void shouldReturnPost_whenGet_ifPostExists() {
         // given
         User user = User.builder().id(USER_ID).build();
         LocalDateTime postedAt = LocalDateTime.now();
@@ -152,7 +155,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenGetPost_ifPostDoesntExist() {
+    void shouldThrowNotFoundException_whenGet_ifPostDoesntExist() {
         // given
         when(postRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -169,7 +172,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldUpdatePost_whenUpdatePost_ifPostExists() {
+    void shouldReturnPost_whenUpdate_ifPostExists() {
         // given
         User user = User.builder().id(USER_ID).build();
         String newDescription = "New description";
@@ -199,7 +202,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenUpdatePost_ifPostDoesntExist() {
+    void shouldThrowNotFoundException_whenUpdate_ifPostDoesntExist() {
         // given
         when(postRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -217,7 +220,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldDeletePost_whenDeletePost_ifPostExists() {
+    void shouldDeletePost_whenDelete_ifPostExists() {
         // given
         User user = createUser();
         Post post = createPostByIdAndUser(user);
@@ -233,7 +236,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenDeletePost_ifPostDoesntExist() {
+    void shouldThrowNotFoundException_whenDelete_ifPostDoesntExist() {
         // given
         when(postRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -248,6 +251,29 @@ class PostServiceImplTest {
         // and
         verify(postRepository).findById(any());
         verify(postRepository, never()).delete(any());
+    }
+
+    @Test
+    void shouldReturnComments_whenGetAllCommentsForPost_ifPostExists() {
+        // given
+        User user = createUser();
+        Post post = createPostByIdAndUser(user);
+        Comment comment = Comment.builder()
+                        .post(post)
+                        .commentedBy(user)
+                        .build();
+        post.setComments(List.of(comment));
+
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+
+        // when
+        List<CommentDTO> foundComments = postService.getAllCommentsForPost(POST_ID);
+
+        // then
+        assertEquals(List.of(toCommentDTO(comment)), foundComments);
+
+        // and
+        verify(postRepository).findById(any());
     }
 
     private Post createPost(User user, LocalDateTime createdAt) {

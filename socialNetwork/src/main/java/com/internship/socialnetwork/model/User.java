@@ -1,6 +1,9 @@
 package com.internship.socialnetwork.model;
 
+import com.internship.socialnetwork.model.enumeration.Role;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +14,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import java.util.List;
 
 @Data
@@ -49,5 +51,8 @@ public class User {
 
     @OneToMany(mappedBy = "commentedBy", cascade = CascadeType.ALL)
     private List<Comment> postedComments;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 }

@@ -12,11 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
+import static com.internship.socialnetwork.model.enumeration.Role.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +37,8 @@ class UserServiceImplTest {
 
     private static final String EMAIL = "test@email.com";
 
+    private static final String PASSWORD = "testPassword123!";
+
     private static final String USER_WITH_EMAIL_EXISTS_MESSAGE = "User with email test@email.com already exists!";
 
     private static final String USER_WITH_USERNAME_EXISTS_MESSAGE = "User with username test_username already exists!";
@@ -42,11 +46,14 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserServiceImpl userService;
 
     @Test
-    void shouldSaveUser_whenCreateUser_ifUserDoesntExist() {
+    void shouldReturnUser_whenCreate_ifUserDoesntExist() {
         // given
         NewUserDTO newUserDTO = createNewUserDTO();
         User user = new User();
@@ -55,7 +62,7 @@ class UserServiceImplTest {
         copyProperties(newUserDTO, user);
         copyProperties(newUserDTO, userDTO);
 
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.save(any())).thenReturn(user);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
@@ -72,7 +79,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenCreateUser_ifUserWithEmailExists() {
+    void shouldThrowBadRequestException_whenCreate_ifUserWithEmailExists() {
         // given
         User existingUser = createUser(USER_ID);
         NewUserDTO newUserDTO = createNewUserDTO();
@@ -93,7 +100,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenCreateUser_ifUserWithUsernameExists() {
+    void shouldThrowBadRequestException_whenCreate_ifUserWithUsernameExists() {
         // given
         User existingUser = createUser(USER_ID);
         NewUserDTO newUserDTO = createNewUserDTO();
@@ -133,7 +140,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldReturnUser_whenFindUserById_ifUserExists() {
+    void shouldReturnUser_whenFindById_ifUserExists() {
         // given
         User user = createUser(USER_ID);
 
@@ -150,7 +157,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenFindUserById_ifUserWithIdDoesntExist() {
+    void shouldThrowNotFoundException_whenFindById_ifUserWithIdDoesntExist() {
         // given
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -167,7 +174,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldReturnUser_whenGetUser_ifUserExists() {
+    void shouldReturnUser_whenGet_ifUserExists() {
         // given
         User user = createUser(USER_ID);
         UserDTO userDTO = toUserDTO(user);
@@ -185,7 +192,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldReturnUser_whenUpdateUser_ifUserExists() {
+    void shouldReturnUser_whenUpdate_ifUserExists() {
         // given
         String newUsername = "new_username";
         User user = createUser(USER_ID);
@@ -211,7 +218,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenUpdateUser_ifUserWithEmailExists() {
+    void shouldThrowBadRequestException_whenUpdate_ifUserWithEmailExists() {
         // given
         NewUserDTO updates = createNewUserDTO();
         User otherUser = createUser(2L);
@@ -232,7 +239,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenUpdateUser_ifUserWithUsernameExists() {
+    void shouldThrowBadRequestException_whenUpdate_ifUserWithUsernameExists() {
         // given
         NewUserDTO updates = createNewUserDTO();
         User otherUser = createUser(2L);
@@ -255,7 +262,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldDeleteUser_whenDeleteUser_IfUserExists() {
+    void shouldDeleteUser_whenDelete_IfUserExists() {
         // given
         User user = createUser(USER_ID);
 
@@ -286,11 +293,47 @@ class UserServiceImplTest {
         verify(userRepository).findByUsernameOrFirstNameOrLastName(any(), any(), any());
     }
 
+    @Test
+    void shouldReturnUser_whenFindByUsername_ifUserExists() {
+        // given
+        User user = createUser(USER_ID);
+
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
+
+        // when
+        User foundUser = userService.findByUsername(USERNAME);
+
+        // then
+        assertEquals(user, foundUser);
+
+        // and
+        verify(userRepository).findByUsername(any());
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenFindByUsername_ifUserWithUsernameDoesntExist() {
+        // given
+        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+
+        // when
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.findByUsername(USERNAME);
+        });
+
+        // then
+        assertEquals("User with username test_username doesn't exist!", exception.getMessage());
+
+        // and
+        verify(userRepository).findByUsername(any());
+    }
+
     private User createUser(Long userId) {
         return User.builder()
                 .id(userId)
                 .email(EMAIL)
                 .username(USERNAME)
+                .password(PASSWORD)
+                .role(USER)
                 .build();
     }
 
@@ -298,6 +341,7 @@ class UserServiceImplTest {
         return NewUserDTO.builder()
                 .email(EMAIL)
                 .username(USERNAME)
+                .password(PASSWORD)
                 .build();
     }
 

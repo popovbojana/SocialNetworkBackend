@@ -12,8 +12,8 @@ import com.internship.socialnetwork.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,9 +37,30 @@ public class UserController {
 
     private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity<UserDTO> register(@Valid @RequestBody NewUserDTO newUser) {
-        return new ResponseEntity<>(userService.create(newUser), HttpStatus.CREATED);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<UserDTO> get(@PathVariable Long id) {
+        return new ResponseEntity<>(userService.get(id), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String username,
+                                                @RequestParam(required = false) String firstName,
+                                                @RequestParam(required = false) String lastName) {
+        return new ResponseEntity<>(userService.search(username, firstName, lastName), HttpStatus.OK);
+
+    }
+
+    @PutMapping(value = "/{id}")
+    @PreAuthorize("@authServiceImpl.hasAccess(#id)")
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody NewUserDTO updatedUser) {
+        return new ResponseEntity<>(userService.update(id, updatedUser), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @PreAuthorize("@authServiceImpl.hasAccess(#id)")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/{id}/friends")
@@ -48,41 +69,20 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friend-requests")
+    @PreAuthorize("@authServiceImpl.hasAccess(#id)")
     public ResponseEntity<List<FriendRequestDTO>> getAllByStatusForUser(@PathVariable Long id, @RequestParam(required = false) FriendRequestStatus status) {
         return new ResponseEntity<>(friendRequestService.getAllByStatusForUser(id, status), HttpStatus.OK);
     }
 
-    @PostMapping(value = "{id}/posts")
+    @PostMapping(value = "/{id}/posts")
+    @PreAuthorize("@authServiceImpl.hasAccess(#id)")
     public ResponseEntity<PostDTO> create(@PathVariable Long id, @Valid @RequestBody NewPostDTO newPostDTO) {
         return new ResponseEntity<>(postService.create(id, newPostDTO), HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "{id}/posts")
+    @GetMapping(value = "/{id}/posts")
     public ResponseEntity<List<PostDTO>> getAllForUser(@PathVariable Long id) {
         return new ResponseEntity<>(postService.getAllForUser(id), HttpStatus.OK);
-
-    @GetMapping(value = "{id}")
-    public ResponseEntity<UserDTO> get(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.get(id), HttpStatus.OK);
-    }
-
-    @PutMapping(value = "{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody NewUserDTO updatedUser) {
-        return new ResponseEntity<>(userService.update(id, updatedUser), HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String username,
-                                          @RequestParam(required = false) String firstName,
-                                          @RequestParam(required = false) String lastName) {
-        return new ResponseEntity<>(userService.search(username, firstName, lastName), HttpStatus.OK);
-
     }
 
 }

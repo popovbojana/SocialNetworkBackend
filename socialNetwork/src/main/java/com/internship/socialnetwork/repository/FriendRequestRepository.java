@@ -24,7 +24,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Fr
 
     @Query("SELECT friendRequest FROM FriendRequest friendRequest " +
             "WHERE (friendRequest.id.fromUser = :id OR friendRequest.id.toUser = :id) " +
-            "AND friendRequest.status = :status")
+            "AND (:status IS NULL OR friendRequest.status = :status)")
     List<FriendRequest> findAllByStatusForUser(Long id, FriendRequestStatus status);
+
 
 }

@@ -5,12 +5,13 @@ import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
 import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.User;
+import com.internship.socialnetwork.model.enumeration.Role;
 import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.internship.socialnetwork.dto.NewUserDTO.toUser;
 import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class UserServiceImpl implements UserService {
     private final String USER_WITH_USERNAME_ALREADY_EXISTS_MESSAGE = "User with username %s already exists!";
 
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO create(NewUserDTO newUserDTO) {
@@ -67,13 +70,18 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(String.format("User with username %s doesn't exist!", username)));
+    }
 
     private User updateUser(User user, NewUserDTO updatedUser) {
         user.setEmail(updatedUser.getEmail());
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setUsername(updatedUser.getUsername());
-        user.setPassword(updatedUser.getPassword());
+        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         return userRepository.save(user);
     }
@@ -103,5 +111,16 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    private User toUser(NewUserDTO newUserDTO) {
+        return User.builder()
+                .email(newUserDTO.getEmail())
+                .firstName(newUserDTO.getFirstName())
+                .lastName(newUserDTO.getLastName())
+                .username(newUserDTO.getUsername())
+                .password(passwordEncoder.encode(newUserDTO.getPassword()))
+                .role(Role.USER)
+                .phoneNumber(newUserDTO.getPhoneNumber())
+                .build();
+    }
 
 }

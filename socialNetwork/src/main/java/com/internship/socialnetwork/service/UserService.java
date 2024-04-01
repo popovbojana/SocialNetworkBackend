@@ -21,4 +21,7 @@ public interface UserService {
     void delete(Long id);
 
     List<UserDTO> search(String username, String firstName, String lastName);
+
+    User findByUsername(String username);
+
 }

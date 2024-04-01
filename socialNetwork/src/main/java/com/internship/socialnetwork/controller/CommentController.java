@@ -4,8 +4,8 @@ import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +25,7 @@ public class CommentController {
     }
 
     @DeleteMapping(value = "/{id}")
+    @PreAuthorize("@authServiceImpl.hasAccessForComment(#id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         commentService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

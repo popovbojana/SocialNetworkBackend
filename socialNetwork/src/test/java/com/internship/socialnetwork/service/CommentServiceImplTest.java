@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -85,7 +86,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void shouldSaveComment_whenCreateComment_ifPostExists() {
+    void shouldReturnComment_whenCreate_ifPostExists() {
         // given
         NewCommentDTO newCommentDTO = createNewCommentDTO();
         Post post = createPost();
@@ -113,7 +114,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void shouldSaveComment_whenCreateComment_ifParentCommentExists() {
+    void shouldReturnComment_whenCreate_ifParentCommentExists() {
         // given
         NewCommentDTO newCommentDTO = createNewCommentDTO();
         newCommentDTO.setParentCommentId(COMMENT_ID);
@@ -147,7 +148,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenCreateComment_ifPostDoesntExist(){
+    void shouldThrowNotFoundException_whenCreate_ifPostDoesntExist(){
         // given
         when(postService.findById(any())).thenThrow(new NotFoundException(POST_NOT_FOUND_MESSAGE));
 
@@ -166,7 +167,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void shouldReturnComment_whenGetComment_ifCommentExists() {
+    void shouldReturnComment_whenGet_ifCommentExists() {
         // given
         Post post = createPost();
         User user = createUser();
@@ -186,7 +187,7 @@ class CommentServiceImplTest {
     }
 
     @Test
-    void shouldDeleteComment_whenDeleteComment_ifCommentExists() {
+    void shouldDeleteComment_whenDelete_ifCommentExists() {
         // given
         Post post = createPost();
         User user = createUser();
@@ -198,7 +199,7 @@ class CommentServiceImplTest {
         commentService.delete(COMMENT_ID);
 
         // then
-        verify(commentRepository).findById(any());
+        verify(commentRepository, atLeastOnce()).findById(any());
     }
 
     private User createUser() {
