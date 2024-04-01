@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,6 +60,29 @@ public class UserController {
     @GetMapping(value = "{id}/posts")
     public ResponseEntity<List<PostDTO>> getAllForUser(@PathVariable Long id) {
         return new ResponseEntity<>(postService.getAllForUser(id), HttpStatus.OK);
+
+    @GetMapping(value = "{id}")
+    public ResponseEntity<UserDTO> get(@PathVariable Long id) {
+        return new ResponseEntity<>(userService.get(id), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody NewUserDTO updatedUser) {
+        return new ResponseEntity<>(userService.update(id, updatedUser), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String username,
+                                          @RequestParam(required = false) String firstName,
+                                          @RequestParam(required = false) String lastName) {
+        return new ResponseEntity<>(userService.search(username, firstName, lastName), HttpStatus.OK);
+
     }
 
 }

@@ -4,6 +4,7 @@ import com.internship.socialnetwork.model.Post;
 import com.internship.socialnetwork.model.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class NewPostDTO {
     private String description;
 
     @NotBlank
+    @Size(max = 500, message = "can have maximum 1000 characters")
     private String media;
 
     public static Post toPost(User user, NewPostDTO newPostDTO) {

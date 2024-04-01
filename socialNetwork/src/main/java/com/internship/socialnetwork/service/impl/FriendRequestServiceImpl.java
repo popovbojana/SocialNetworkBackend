@@ -22,16 +22,17 @@ import static com.internship.socialnetwork.dto.FriendRequestDTO.toFriendRequestD
 @RequiredArgsConstructor
 public class FriendRequestServiceImpl implements FriendRequestService {
 
+    private static final String FRIEND_REQUEST_NOT_FOUND_MESSAGE = "Friend request between users %s and %s doesn't exist!";
+
     private final FriendRequestRepository friendRequestRepository;
 
     private final UserService userService;
 
-    private static final String FRIEND_REQUEST_NOT_FOUND_MESSAGE = "Friend request between users %s and %s doesn't exist!";
-
     @Override
-    public FriendRequestDTO create(Long userId, Long otherUserId) {
-        FriendRequestId friendRequestId = new FriendRequestId(userId, otherUserId);
+    public FriendRequestDTO create(Long fromUserId, Long toUserId) {
+        FriendRequestId friendRequestId = new FriendRequestId(fromUserId, toUserId);
         User fromUser = userService.findById(friendRequestId.getFromUser());
+        checkIfLimitIsReached(fromUserId);
         User toUser = userService.findById(friendRequestId.getToUser());
         friendRequestRepository.findById(friendRequestId)
                 .ifPresent(friendRequest -> {
@@ -41,8 +42,8 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     @Override
-    public FriendRequestDTO get(Long fromUser, Long toUserId) {
-        return toFriendRequestDTO(findFriendRequestBetweenUsers(fromUser, toUserId));
+    public FriendRequestDTO get(Long fromUserId, Long toUserId) {
+        return toFriendRequestDTO(findFriendRequestBetweenUsers(fromUserId, toUserId));
     }
 
     @Override
@@ -67,6 +68,9 @@ public class FriendRequestServiceImpl implements FriendRequestService {
                 .orElseThrow(() -> new NotFoundException(String.format(FRIEND_REQUEST_NOT_FOUND_MESSAGE, fromUserId, toUserId)));
         // TODO: check if user is to user from friend request
         if (friendRequest.getStatus() == FriendRequestStatus.PENDING) {
+            if (status.equals(FriendRequestStatus.ACCEPTED)) {
+                checkIfLimitIsReached(toUserId);
+            }
             friendRequest.setStatus(status);
         } else {
             throw new BadRequestException("Friend request isn't pending!");
@@ -77,6 +81,13 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     @Override
     public void delete(Long fromUserId, Long toUserId) {
         friendRequestRepository.delete(findFriendRequestBetweenUsers(fromUserId, toUserId));
+    }
+
+    private void checkIfLimitIsReached(Long userId) {
+        // TODO: change to larger number (2 is for testing purposes)
+        if (userService.getAllFriendsById(userId).size() >= 2) {
+            throw new BadRequestException("Maximum number of friends limit reached.");
+        }
     }
 
     private FriendRequest findFriendRequestBetweenUsers(Long fromUserId, Long toUserId) {

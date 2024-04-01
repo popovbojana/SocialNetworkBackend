@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -37,6 +38,7 @@ public class Post {
     private String description;
 
     //TODO: change to specific media type
+    @Column(length = 1000)
     private String media;
 
     private LocalDateTime postedAt;
