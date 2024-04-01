@@ -49,11 +49,11 @@ class FriendRequestServiceImplTest {
     private FriendRequestServiceImpl friendRequestService;
 
     @Test
-    void shouldCreateRequest() {
+    void shouldSavePost_whenCreateRequest_ifRequestDoesntExist() {
         // given
         User user = createUser(USER_ID);
         User otherUser = createUser(OTHER_USER_ID);
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), user, otherUser, FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), user, otherUser, FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
 
         when(userService.findById(USER_ID)).thenReturn(user);
@@ -78,7 +78,7 @@ class FriendRequestServiceImplTest {
         // given
         User user = createUser(USER_ID);
         User otherUser = createUser(OTHER_USER_ID);
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
 
         when(userService.findById(USER_ID)).thenReturn(user);
         when(userService.findById(OTHER_USER_ID)).thenReturn(otherUser);
@@ -122,9 +122,9 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldGetRequest() {
+    void shouldReturnRequest_whenGetRequest_ifRequestExists() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
 
         when(friendRequestRepository.findFriendRequestBetweenUsers(any(), any())).thenReturn(Optional.of(friendRequest));
@@ -157,9 +157,9 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldGetAllRequestsForUser() {
+    void shouldReturnAllRequests_whenGetAllRequestsForUser_ifUserExists() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
 
         when(friendRequestRepository.findAllForUser(any())).thenReturn(List.of(friendRequest));
@@ -175,9 +175,9 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldGetAllRequestsByStatusForUser() {
+    void shouldReturnGetAllRequestsByStatusForUser() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
 
         when(friendRequestRepository.findAllByStatusForUser(any(), any())).thenReturn(List.of(friendRequest));
@@ -193,10 +193,10 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldRespondToPendingRequest() {
+    void shouldUpdateRequestStatus_whenRespondToPendingRequestifRequestExists() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
-        FriendRequest acceptedFriendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.ACCEPTED);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest acceptedFriendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.ACCEPTED);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(acceptedFriendRequest);
 
         when(friendRequestRepository.findById(any())).thenReturn(Optional.of(friendRequest));
@@ -234,7 +234,7 @@ class FriendRequestServiceImplTest {
     @Test
     void shouldThrowBadRequestException_whenRespondToPendingRequest_ifRequestIsntPending() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.ACCEPTED);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.ACCEPTED);
 
         when(friendRequestRepository.findById(any())).thenReturn(Optional.of(friendRequest));
 
@@ -252,9 +252,9 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldDeleteRequest() {
+    void shouldDeleteRequest_whenDeleteRequest_ifRequestExists() {
         // given
-        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(USER_ID, OTHER_USER_ID), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
+        FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
 
         when(friendRequestRepository.findFriendRequestBetweenUsers(any(), any())).thenReturn(Optional.of(friendRequest));
 
@@ -262,8 +262,6 @@ class FriendRequestServiceImplTest {
         friendRequestService.delete(USER_ID, OTHER_USER_ID);
 
         // then
-
-        // and
         verify(friendRequestRepository).findFriendRequestBetweenUsers(any(), any());
         verify(friendRequestRepository).delete(any());
     }
@@ -301,8 +299,8 @@ class FriendRequestServiceImplTest {
                 .build();
     }
 
-    private FriendRequestId createFriendRequestId(Long userId, Long otherUserId) {
-        return new FriendRequestId(userId, otherUserId);
+    private FriendRequestId createFriendRequestId() {
+        return new FriendRequestId(USER_ID, OTHER_USER_ID);
     }
 
 }

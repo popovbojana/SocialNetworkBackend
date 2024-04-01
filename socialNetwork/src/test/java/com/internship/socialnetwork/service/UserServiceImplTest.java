@@ -46,7 +46,7 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Test
-    void shouldAddNewUser() {
+    void shouldSaveUser_whenCreateUser_ifUserDoesntExist() {
         // given
         NewUserDTO newUserDTO = createNewUserDTO();
         User user = new User();
@@ -72,7 +72,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenAddNewUser_ifUserWithEmailExists() {
+    void shouldThrowBadRequestException_whenCreateUser_ifUserWithEmailExists() {
         // given
         User existingUser = createUser(USER_ID);
         NewUserDTO newUserDTO = createNewUserDTO();
@@ -93,7 +93,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenAddNewUser_ifUserWithUsernameExists() {
+    void shouldThrowBadRequestException_whenCreateUser_ifUserWithUsernameExists() {
         // given
         User existingUser = createUser(USER_ID);
         NewUserDTO newUserDTO = createNewUserDTO();
@@ -114,7 +114,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldGetAllFriendsById() {
+    void shouldReturnAllFriends_whenGetAllFriendsByUserId_ifUserExists() {
         // given
         User user = createUser(USER_ID);
         User friend = createUser(2L);
@@ -133,7 +133,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldFindUserById() {
+    void shouldReturnUser_whenFindUserById_ifUserExists() {
         // given
         User user = createUser(USER_ID);
 

@@ -14,8 +14,8 @@ import static com.internship.socialnetwork.dto.NewUserDTO.toUser;
 import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final String USER_WITH_EMAIL_ALREADY_EXISTS_MESSAGE = "User with email %s already exists!";
@@ -40,7 +40,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User with id %s doesn't exist!", id)));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %s doesn't exist!", id)));
     }
 
     @Override

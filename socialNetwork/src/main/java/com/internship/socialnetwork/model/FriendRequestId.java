@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Embeddable
 public class FriendRequestId implements Serializable {
 

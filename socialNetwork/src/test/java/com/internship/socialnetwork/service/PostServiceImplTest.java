@@ -51,7 +51,7 @@ class PostServiceImplTest {
     private PostServiceImpl postService;
 
     @Test
-    void shouldCreatePost() {
+    void shouldSavePost_whenCreatePost_ifUserExists() {
         // given
         LocalDateTime createdAt = LocalDateTime.now();
 
@@ -60,11 +60,11 @@ class PostServiceImplTest {
                 .media(TEST_MEDIA)
                 .build();
 
-        User user = createUser(USER_ID);
+        User user = createUser();
 
-        Post post = createPost(user, TEST_DESCRIPTION, TEST_MEDIA, createdAt);
+        Post post = createPost(user, createdAt);
 
-        PostDTO postDTO = createPostDTO(USER_ID, TEST_DESCRIPTION, TEST_MEDIA, createdAt);
+        PostDTO postDTO = createPostDTO(TEST_DESCRIPTION, TEST_MEDIA, createdAt);
 
         when(userService.findById(any())).thenReturn(user);
         when(postRepository.save(any())).thenReturn(post);
@@ -104,17 +104,17 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldGetAllPostsForUser() {
+    void shouldReturnAllPosts_whenGetAllPostsForUser_ifUserExists() {
         // given
         LocalDateTime createdAt = LocalDateTime.now();
 
-        User user = createUser(USER_ID);
+        User user = createUser();
 
-        Post post = createPost(user, TEST_DESCRIPTION, TEST_MEDIA, createdAt);
+        Post post = createPost(user, createdAt);
 
         List<Post> posts = List.of(post);
 
-        PostDTO postDTO = createPostDTO(USER_ID, TEST_DESCRIPTION, TEST_MEDIA, createdAt);
+        PostDTO postDTO = createPostDTO(TEST_DESCRIPTION, TEST_MEDIA, createdAt);
 
         List<PostDTO> expectedPosts = new ArrayList<>();
         expectedPosts.add(postDTO);
@@ -132,12 +132,12 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldGetPost() {
+    void shouldReturnPost_whenGetPost_ifPostExists() {
         // given
         User user = User.builder().id(USER_ID).build();
         LocalDateTime postedAt = LocalDateTime.now();
-        Post post = createPost(user, TEST_DESCRIPTION, TEST_MEDIA, postedAt);
-        PostDTO postDTO = createPostDTO(USER_ID, TEST_DESCRIPTION, TEST_MEDIA, postedAt);
+        Post post = createPost(user, postedAt);
+        PostDTO postDTO = createPostDTO(TEST_DESCRIPTION, TEST_MEDIA, postedAt);
 
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
@@ -169,15 +169,15 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldUpdatePost() {
+    void shouldUpdatePost_whenUpdatePost_ifPostExists() {
         // given
         User user = User.builder().id(USER_ID).build();
         String newDescription = "New description";
         String newMedia = "New media";
         LocalDateTime postedAt = LocalDateTime.now();
 
-        Post post = createPost(user, TEST_DESCRIPTION, TEST_MEDIA, postedAt);
-        PostDTO postDTO = createPostDTO(USER_ID, newDescription, newMedia, postedAt);
+        Post post = createPost(user, postedAt);
+        PostDTO postDTO = createPostDTO(newDescription, newMedia, postedAt);
 
         NewPostDTO updatePostDTO = NewPostDTO.builder()
                 .description(newDescription)
@@ -217,10 +217,10 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldDeletePost() {
+    void shouldDeletePost_whenDeletePost_ifPostExists() {
         // given
-        User user = createUser(USER_ID);
-        Post post = createPostByIdAndUser(POST_ID, user);
+        User user = createUser();
+        Post post = createPostByIdAndUser(user);
 
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
@@ -228,8 +228,6 @@ class PostServiceImplTest {
         postService.delete(POST_ID);
 
         // then
-
-        // and
         verify(postRepository).findById(any());
         verify(postRepository).delete(any());
     }
@@ -252,26 +250,26 @@ class PostServiceImplTest {
         verify(postRepository, never()).delete(any());
     }
 
-    private Post createPost(User user, String description, String media, LocalDateTime createdAt) {
+    private Post createPost(User user, LocalDateTime createdAt) {
         return Post.builder()
                 .postedBy(user)
-                .description(description)
-                .media(media)
+                .description(TEST_DESCRIPTION)
+                .media(TEST_MEDIA)
                 .postedAt(createdAt)
                 .comments(new ArrayList<>())
                 .build();
     }
 
-    private Post createPostByIdAndUser(Long postId, User user) {
+    private Post createPostByIdAndUser(User user) {
         return Post.builder()
-                .id(postId)
+                .id(POST_ID)
                 .postedBy(user)
                 .build();
     }
 
-    private PostDTO createPostDTO(Long userId, String description, String media, LocalDateTime createdAt) {
+    private PostDTO createPostDTO(String description, String media, LocalDateTime createdAt) {
         return PostDTO.builder()
-                .userId(userId)
+                .userId(USER_ID)
                 .description(description)
                 .media(media)
                 .postedAt(createdAt)
@@ -279,9 +277,9 @@ class PostServiceImplTest {
                 .build();
     }
 
-    private User createUser(Long id) {
+    private User createUser() {
         return User.builder()
-                .id(id)
+                .id(USER_ID)
                 .build();
     }
 

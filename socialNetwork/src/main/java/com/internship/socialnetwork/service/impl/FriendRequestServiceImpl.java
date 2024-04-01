@@ -18,8 +18,8 @@ import java.util.List;
 
 import static com.internship.socialnetwork.dto.FriendRequestDTO.toFriendRequestDTO;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class FriendRequestServiceImpl implements FriendRequestService {
 
     private static final String FRIEND_REQUEST_NOT_FOUND_MESSAGE = "Friend request between users %s and %s doesn't exist!";
@@ -64,7 +64,8 @@ public class FriendRequestServiceImpl implements FriendRequestService {
 
     @Override
     public FriendRequestDTO respondToPendingRequest(Long fromUserId, Long toUserId, FriendRequestStatus status) {
-        FriendRequest friendRequest = friendRequestRepository.findById(new FriendRequestId(fromUserId, toUserId)).orElseThrow(() -> new NotFoundException(String.format(FRIEND_REQUEST_NOT_FOUND_MESSAGE, fromUserId, toUserId)));
+        FriendRequest friendRequest = friendRequestRepository.findById(new FriendRequestId(fromUserId, toUserId))
+                .orElseThrow(() -> new NotFoundException(String.format(FRIEND_REQUEST_NOT_FOUND_MESSAGE, fromUserId, toUserId)));
         // TODO: check if user is to user from friend request
         if (friendRequest.getStatus() == FriendRequestStatus.PENDING) {
             if (status.equals(FriendRequestStatus.ACCEPTED)) {
@@ -90,7 +91,8 @@ public class FriendRequestServiceImpl implements FriendRequestService {
     }
 
     private FriendRequest findFriendRequestBetweenUsers(Long fromUserId, Long toUserId) {
-        return friendRequestRepository.findFriendRequestBetweenUsers(fromUserId, toUserId).orElseThrow(() -> new NotFoundException(String.format(FRIEND_REQUEST_NOT_FOUND_MESSAGE, fromUserId, toUserId)));
+        return friendRequestRepository.findFriendRequestBetweenUsers(fromUserId, toUserId)
+                .orElseThrow(() -> new NotFoundException(String.format(FRIEND_REQUEST_NOT_FOUND_MESSAGE, fromUserId, toUserId)));
     }
 
     private FriendRequest buildFriendRequest(FriendRequestId friendRequestId, User fromUser, User toUser) {

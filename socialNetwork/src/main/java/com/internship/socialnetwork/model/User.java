@@ -14,10 +14,10 @@ import lombok.Data;
 
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {

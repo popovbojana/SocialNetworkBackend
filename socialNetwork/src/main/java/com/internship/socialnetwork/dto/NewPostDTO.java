@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class NewPostDTO {
 
     @NotBlank

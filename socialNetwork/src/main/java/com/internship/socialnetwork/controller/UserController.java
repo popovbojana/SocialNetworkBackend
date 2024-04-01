@@ -1,10 +1,13 @@
 package com.internship.socialnetwork.controller;
 
 import com.internship.socialnetwork.dto.FriendRequestDTO;
+import com.internship.socialnetwork.dto.NewPostDTO;
+import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.model.enumeration.FriendRequestStatus;
 import com.internship.socialnetwork.service.FriendRequestService;
+import com.internship.socialnetwork.service.PostService;
 import com.internship.socialnetwork.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,42 +35,54 @@ public class UserController {
 
     private final FriendRequestService friendRequestService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    private final PostService postService;
+
+    @PostMapping
     public ResponseEntity<UserDTO> register(@Valid @RequestBody NewUserDTO newUser) {
         return new ResponseEntity<>(userService.create(newUser), HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{id}/friends", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/friends")
     public ResponseEntity<List<UserDTO>> getAllFriends(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getAllFriendsById(id), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}/friend-requests", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/friend-requests")
     public ResponseEntity<List<FriendRequestDTO>> getAllByStatusForUser(@PathVariable Long id, @RequestParam(required = false) FriendRequestStatus status) {
         return new ResponseEntity<>(friendRequestService.getAllByStatusForUser(id, status), HttpStatus.OK);
     }
 
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{id}/posts")
+    public ResponseEntity<PostDTO> create(@PathVariable Long id, @Valid @RequestBody NewPostDTO newPostDTO) {
+        return new ResponseEntity<>(postService.create(id, newPostDTO), HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "{id}/posts")
+    public ResponseEntity<List<PostDTO>> getAllForUser(@PathVariable Long id) {
+        return new ResponseEntity<>(postService.getAllForUser(id), HttpStatus.OK);
+
+    @GetMapping(value = "{id}")
     public ResponseEntity<UserDTO> get(@PathVariable Long id) {
         return new ResponseEntity<>(userService.get(id), HttpStatus.OK);
     }
 
-    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody NewUserDTO updatedUser) {
         return new ResponseEntity<>(userService.update(id, updatedUser), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String username,
                                           @RequestParam(required = false) String firstName,
                                           @RequestParam(required = false) String lastName) {
         return new ResponseEntity<>(userService.search(username, firstName, lastName), HttpStatus.OK);
+
     }
 
 }
