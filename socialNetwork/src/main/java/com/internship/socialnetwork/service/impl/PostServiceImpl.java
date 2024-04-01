@@ -21,11 +21,11 @@ import static com.internship.socialnetwork.dto.PostDTO.toPostDTO;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private static final String POST_NOT_FOUND_MESSAGE = "Post with id %s doesn't exist!";
+
     private final PostRepository postRepository;
 
     private final UserService userService;
-
-    private static final String POST_NOT_FOUND_MESSAGE = "Post with id %s doesn't exist!";
 
     @Override
     public PostDTO create(Long userId, NewPostDTO newPostDTO) {
