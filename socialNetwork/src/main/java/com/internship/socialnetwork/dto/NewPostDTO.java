@@ -2,7 +2,6 @@ package com.internship.socialnetwork.dto;
 
 import com.internship.socialnetwork.model.Post;
 import com.internship.socialnetwork.model.User;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

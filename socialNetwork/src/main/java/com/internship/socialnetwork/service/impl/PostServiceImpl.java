@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.service.impl;
 
+import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.exception.NotFoundException;
@@ -62,6 +63,13 @@ public class PostServiceImpl implements PostService {
     public Post findById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format(POST_NOT_FOUND_MESSAGE, id)));
+    }
+
+    @Override
+    public List<CommentDTO> getAllCommentsForPost(Long id) {
+        return findById(id).getComments().stream()
+                .map(CommentDTO::toCommentDTO)
+                .toList();
     }
 
 }

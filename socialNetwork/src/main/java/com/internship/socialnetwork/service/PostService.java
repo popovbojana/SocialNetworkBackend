@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.service;
 
+import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.model.Post;
@@ -19,5 +20,7 @@ public interface PostService {
     void delete(Long id);
 
     Post findById(Long id);
+
+    List<CommentDTO> getAllCommentsForPost(Long id);
 
 }

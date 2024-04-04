@@ -1,6 +1,5 @@
 package com.internship.socialnetwork.dto;
 
-import com.internship.socialnetwork.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -33,17 +32,5 @@ public class NewUserDTO {
     private String password;
 
     private String phoneNumber;
-
-    public static User toUser(NewUserDTO newUserDTO){
-        return User.builder()
-                .email(newUserDTO.getEmail())
-                .firstName(newUserDTO.getFirstName())
-                .lastName(newUserDTO.getLastName())
-                .username(newUserDTO.getUsername())
-                //TODO: encode passwords
-                .password(newUserDTO.getPassword())
-                .phoneNumber(newUserDTO.getPhoneNumber())
-                .build();
-    }
 
 }

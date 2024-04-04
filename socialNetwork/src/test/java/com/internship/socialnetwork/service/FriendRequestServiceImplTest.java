@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.service;
 
+import com.internship.socialnetwork.config.ApplicationConfig;
 import com.internship.socialnetwork.dto.FriendRequestDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +45,14 @@ class FriendRequestServiceImplTest {
     @Mock
     private UserServiceImpl userService;
 
+    @Mock
+    private ApplicationConfig applicationConfig;
+
     @InjectMocks
     private FriendRequestServiceImpl friendRequestService;
 
     @Test
-    void shouldSavePost_whenCreateRequest_ifRequestDoesntExist() {
+    void shouldReturnPost_whenCreate_ifRequestDoesntExist() {
         // given
         User user = createUser(USER_ID);
         User otherUser = createUser(OTHER_USER_ID);
@@ -60,6 +63,7 @@ class FriendRequestServiceImplTest {
         when(userService.findById(OTHER_USER_ID)).thenReturn(otherUser);
         when(friendRequestRepository.findById(any())).thenReturn(Optional.empty());
         when(friendRequestRepository.save(any())).thenReturn(friendRequest);
+        when(applicationConfig.getFriendsLimit()).thenReturn(10);
 
         // when
         FriendRequestDTO createdRequest = friendRequestService.create(USER_ID, OTHER_USER_ID);
@@ -74,7 +78,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenCreateRequest_ifRequestAlreadyExists() {
+    void shouldThrowBadRequestException_whenCreate_ifRequestAlreadyExists() {
         // given
         User user = createUser(USER_ID);
         User otherUser = createUser(OTHER_USER_ID);
@@ -83,6 +87,7 @@ class FriendRequestServiceImplTest {
         when(userService.findById(USER_ID)).thenReturn(user);
         when(userService.findById(OTHER_USER_ID)).thenReturn(otherUser);
         when(friendRequestRepository.findById(any())).thenReturn(Optional.of(friendRequest));
+        when(applicationConfig.getFriendsLimit()).thenReturn(10);
 
         // when
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
@@ -99,7 +104,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowBadRequestException_whenCreateRequest_ifLimitIsReached() {
+    void shouldThrowBadRequestException_whenCreate_ifLimitIsReached() {
         // given
         User user = createUser(USER_ID);
         List<UserDTO> friends = List.of(new UserDTO(), new UserDTO());
@@ -122,7 +127,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldReturnRequest_whenGetRequest_ifRequestExists() {
+    void shouldReturnRequest_whenGet_ifRequestExists() {
         // given
         FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
@@ -140,7 +145,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenGetRequest_ifRequestDoesntExist() {
+    void shouldThrowNotFoundException_whenGet_ifRequestDoesntExist() {
         // given
         when(friendRequestRepository.findFriendRequestBetweenUsers(any(), any())).thenReturn(Optional.empty());
 
@@ -157,12 +162,13 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldReturnAllRequests_whenGetAllRequestsForUser_ifUserExists() {
+    void shouldReturnAllRequests_whenGetAllForUser_ifUserExists() {
         // given
         FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
 
         when(friendRequestRepository.findAllForUser(any())).thenReturn(List.of(friendRequest));
+        when(applicationConfig.getFriendsLimit()).thenReturn(10);
 
         // when
         List<FriendRequestDTO> foundRequests = friendRequestService.getAllForUser(USER_ID);
@@ -175,7 +181,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldReturnGetAllRequestsByStatusForUser() {
+    void shouldReturnRequests_whenGetAllByStatusForUser_ifUserExists() {
         // given
         FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequestDTO friendRequestDTO = toFriendRequestDTO(friendRequest);
@@ -193,7 +199,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldUpdateRequestStatus_whenRespondToPendingRequestifRequestExists() {
+    void shouldUpdateRequestStatus_whenRespondToPendingRequest_ifRequestExists() {
         // given
         FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
         FriendRequest acceptedFriendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.ACCEPTED);
@@ -201,6 +207,7 @@ class FriendRequestServiceImplTest {
 
         when(friendRequestRepository.findById(any())).thenReturn(Optional.of(friendRequest));
         when(friendRequestRepository.save(any())).thenReturn(acceptedFriendRequest);
+        when(applicationConfig.getFriendsLimit()).thenReturn(10);
 
         // when
         FriendRequestDTO foundRequests = friendRequestService.respondToPendingRequest(USER_ID, OTHER_USER_ID, FriendRequestStatus.ACCEPTED);
@@ -252,7 +259,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldDeleteRequest_whenDeleteRequest_ifRequestExists() {
+    void shouldDeleteRequest_whenDelete_ifRequestExists() {
         // given
         FriendRequest friendRequest = createFriendRequest(createFriendRequestId(), createUser(USER_ID), createUser(OTHER_USER_ID), FriendRequestStatus.PENDING);
 
@@ -267,7 +274,7 @@ class FriendRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundException_whenDeleteRequest_ifRequestDoesntExist() {
+    void shouldThrowNotFoundException_whenDelete_ifRequestDoesntExist() {
         // given
         when(friendRequestRepository.findFriendRequestBetweenUsers(any(), any())).thenReturn(Optional.empty());
 
