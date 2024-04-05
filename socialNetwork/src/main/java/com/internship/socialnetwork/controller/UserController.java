@@ -5,7 +5,9 @@ import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.dto.NewUserDTO;
+import com.internship.socialnetwork.model.ChatMessage;
 import com.internship.socialnetwork.model.enumeration.FriendRequestStatus;
+import com.internship.socialnetwork.service.ChatMessageService;
 import com.internship.socialnetwork.service.FriendRequestService;
 import com.internship.socialnetwork.service.PostService;
 import com.internship.socialnetwork.service.UserService;
@@ -36,6 +38,8 @@ public class UserController {
     private final FriendRequestService friendRequestService;
 
     private final PostService postService;
+
+    private final ChatMessageService chatMessageService;
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> get(@PathVariable Long id) {
@@ -83,6 +87,17 @@ public class UserController {
     @GetMapping(value = "/{id}/posts")
     public ResponseEntity<List<PostDTO>> getAllForUser(@PathVariable Long id) {
         return new ResponseEntity<>(postService.getAllForUser(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/connected")
+    public ResponseEntity<List<UserDTO>> findConnectedUsers() {
+        return new ResponseEntity<>(userService.findConnectedUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/messages/{senderId}/{recipientId}")
+    public ResponseEntity<List<ChatMessage>> findChatMessages(@PathVariable Long senderId,
+                                                              @PathVariable Long recipientId) {
+        return ResponseEntity.ok(chatMessageService.findChatMessages(senderId, recipientId));
     }
 
 }

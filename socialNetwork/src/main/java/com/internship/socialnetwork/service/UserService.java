@@ -24,4 +24,10 @@ public interface UserService {
 
     User findByUsername(String username);
 
+    void connect(User user);
+
+    void disconnect(User user);
+
+    List<UserDTO> findConnectedUsers();
+
 }

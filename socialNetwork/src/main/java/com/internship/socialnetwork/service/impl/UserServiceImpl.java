@@ -5,7 +5,6 @@ import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
 import com.internship.socialnetwork.exception.NotFoundException;
 import com.internship.socialnetwork.model.User;
-import com.internship.socialnetwork.model.enumeration.Role;
 import com.internship.socialnetwork.repository.UserRepository;
 import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
+import static com.internship.socialnetwork.model.enumeration.Role.USER;
+import static com.internship.socialnetwork.model.enumeration.Status.OFFLINE;
+import static com.internship.socialnetwork.model.enumeration.Status.ONLINE;
+
 import java.util.List;
 
 @Service
@@ -76,6 +79,27 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with username %s doesn't exist!", username)));
     }
 
+    @Override
+    public void connect(User user) {
+        User storedUser = findById(user.getId());
+        storedUser.setStatus(ONLINE);
+        userRepository.save(storedUser);
+    }
+
+    @Override
+    public void disconnect(User user) {
+        User storedUser = findById(user.getId());
+        storedUser.setStatus(OFFLINE);
+        userRepository.save(storedUser);
+    }
+
+    @Override
+    public List<UserDTO> findConnectedUsers() {
+        return userRepository.findAllByStatus(ONLINE).stream()
+                .map(UserDTO::toUserDTO)
+                .toList();
+    }
+
     private User updateUser(User user, NewUserDTO updatedUser) {
         user.setEmail(updatedUser.getEmail());
         user.setFirstName(updatedUser.getFirstName());
@@ -118,7 +142,8 @@ public class UserServiceImpl implements UserService {
                 .lastName(newUserDTO.getLastName())
                 .username(newUserDTO.getUsername())
                 .password(passwordEncoder.encode(newUserDTO.getPassword()))
-                .role(Role.USER)
+                .role(USER)
+                .status(ONLINE)
                 .phoneNumber(newUserDTO.getPhoneNumber())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.internship.socialnetwork.model;
 
 import com.internship.socialnetwork.model.enumeration.Role;
+import com.internship.socialnetwork.model.enumeration.Status;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -54,5 +55,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
 }

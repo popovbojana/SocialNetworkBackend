@@ -19,6 +19,8 @@ import java.util.Optional;
 
 import static com.internship.socialnetwork.dto.UserDTO.toUserDTO;
 import static com.internship.socialnetwork.model.enumeration.Role.USER;
+import static com.internship.socialnetwork.model.enumeration.Status.OFFLINE;
+import static com.internship.socialnetwork.model.enumeration.Status.ONLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -325,6 +327,65 @@ class UserServiceImplTest {
 
         // and
         verify(userRepository).findByUsername(any());
+    }
+
+    @Test
+    void shouldSetStatusToOnline_whenConnect_ifUserExists() {
+        // given
+        User user = createUser(USER_ID);
+        user.setStatus(OFFLINE);
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(user);
+
+        // when
+        userService.connect(user);
+
+        // then
+        assertEquals(user.getStatus(), ONLINE);
+
+        // and
+        verify(userRepository).findById(any());
+        verify(userRepository).save(any());
+    }
+
+    @Test
+    void shouldSetStatusToOffline_whenDisconnect_ifUserExists() {
+        // given
+        User user = createUser(USER_ID);
+        user.setStatus(ONLINE);
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenReturn(user);
+
+        // when
+        userService.disconnect(user);
+
+        // then
+        assertEquals(user.getStatus(), OFFLINE);
+
+        // and
+        verify(userRepository).findById(any());
+        verify(userRepository).save(any());
+    }
+
+    @Test
+    void shouldReturnConnectedUsers_whenFindConnectedUsers_ifConnectedUsersExist() {
+        // given
+        User connectedUser = createUser(USER_ID);
+        connectedUser.setStatus(ONLINE);
+        List<UserDTO> connectedUsers = List.of(toUserDTO(connectedUser));
+
+        when(userRepository.findAllByStatus(any())).thenReturn(List.of(connectedUser));
+
+        // when
+        List<UserDTO> foundUsers = userService.findConnectedUsers();
+
+        // then
+        assertEquals(connectedUsers, foundUsers);
+
+        // and
+        verify(userRepository).findAllByStatus(any());
     }
 
     private User createUser(Long userId) {
