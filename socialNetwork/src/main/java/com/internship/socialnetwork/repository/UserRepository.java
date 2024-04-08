@@ -1,6 +1,7 @@
 package com.internship.socialnetwork.repository;
 
 import com.internship.socialnetwork.model.User;
+import com.internship.socialnetwork.model.enumeration.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,5 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findFriendsById(Long id);
 
     List<User> findByUsernameOrFirstNameOrLastName(String username, String firstName, String lastName);
+
+    List<User> findAllByStatus(Status status);
 
 }
