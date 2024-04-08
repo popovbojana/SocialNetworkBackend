@@ -3,10 +3,12 @@ package com.internship.socialnetwork.service.impl;
 import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
+import com.internship.socialnetwork.dto.UpdatePostDTO;
 import com.internship.socialnetwork.exception.NotFoundException;
+import com.internship.socialnetwork.model.FileData;
 import com.internship.socialnetwork.model.Post;
-import com.internship.socialnetwork.model.User;
 import com.internship.socialnetwork.repository.PostRepository;
+import com.internship.socialnetwork.service.FileDataService;
 import com.internship.socialnetwork.service.PostService;
 import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import static com.internship.socialnetwork.dto.NewPostDTO.toPost;
 import static com.internship.socialnetwork.dto.PostDTO.toPostDTO;
+import static com.internship.socialnetwork.dto.PostDTO.toPostDTOWithFiles;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +30,18 @@ public class PostServiceImpl implements PostService {
 
     private final UserService userService;
 
+    private final FileDataService fileDataService;
+
     @Override
     public PostDTO create(Long userId, NewPostDTO newPostDTO) {
-        User user = userService.findById(userId);
-        return toPostDTO(postRepository.save(toPost(user, newPostDTO)));
+        Post post = postRepository.save(toPost(userService.findById(userId), newPostDTO));
+        if (newPostDTO.getFiles() != null) {
+            List<FileData> files = newPostDTO.getFiles().stream()
+                    .map(file -> fileDataService.create(file, post))
+                    .toList();
+            return toPostDTOWithFiles(post, files);
+        }
+        return toPostDTO(post);
     }
 
     @Override
@@ -47,10 +58,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO update(Long id, NewPostDTO updatedPost) {
+    public PostDTO update(Long id, UpdatePostDTO updatedPost) {
         Post post = findById(id);
         post.setDescription(updatedPost.getDescription());
-        post.setMedia(updatedPost.getMedia());
         return toPostDTO(postRepository.save(post));
     }
 
