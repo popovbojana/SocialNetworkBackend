@@ -3,6 +3,7 @@ package com.internship.socialnetwork.service;
 import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
+import com.internship.socialnetwork.dto.UpdatePostDTO;
 import com.internship.socialnetwork.model.Post;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface PostService {
 
     PostDTO get(Long id);
 
-    PostDTO update(Long id, NewPostDTO updatedPost);
+    PostDTO update(Long id, UpdatePostDTO updatedPost);
 
     void delete(Long id);
 

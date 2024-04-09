@@ -2,8 +2,8 @@ package com.internship.socialnetwork.controller;
 
 import com.internship.socialnetwork.dto.CommentDTO;
 import com.internship.socialnetwork.dto.NewCommentDTO;
-import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
+import com.internship.socialnetwork.dto.UpdatePostDTO;
 import com.internship.socialnetwork.service.CommentService;
 import com.internship.socialnetwork.service.PostService;
 import jakarta.validation.Valid;
@@ -44,7 +44,7 @@ public class PostController {
 
     @PutMapping(value = "/{id}")
     @PreAuthorize("@authServiceImpl.hasAccessForPost(#id)")
-    public ResponseEntity<PostDTO> update(@PathVariable Long id, @Valid @RequestBody NewPostDTO updatedPost) {
+    public ResponseEntity<PostDTO> update(@PathVariable Long id, @Valid @RequestBody UpdatePostDTO updatedPost) {
         return new ResponseEntity<>(postService.update(id, updatedPost), HttpStatus.OK);
     }
 

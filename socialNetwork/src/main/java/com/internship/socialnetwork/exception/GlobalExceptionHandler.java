@@ -43,6 +43,11 @@ public class GlobalExceptionHandler {
         return createResponseEntity(createErrorMessage(exception, HttpStatus.UNAUTHORIZED));
     }
 
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ErrorMessage> handleFileUploadException(FileUploadException exception) {
+        return createResponseEntity(createErrorMessage(exception, HttpStatus.BAD_REQUEST));
+    }
+
     private ResponseEntity<ErrorMessage> createResponseEntity(ErrorMessage errorMessage) {
         return new ResponseEntity<>(errorMessage, errorMessage.getHttpStatus());
     }

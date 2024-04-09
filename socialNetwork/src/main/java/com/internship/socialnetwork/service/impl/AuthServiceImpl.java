@@ -82,10 +82,6 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken;
         String username;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-
         refreshToken = authHeader.substring(7);
         username = jwtService.extractUsername(refreshToken);
 

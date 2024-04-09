@@ -30,6 +30,9 @@ public class ApplicationConfig {
     @Value("${refresh.token.expiration}")
     private int refreshTokenExpiration;
 
+    @Value("${files.path}")
+    private String filesPath;
+
     private final UserDetailsService userDetailsService;
 
     @Bean
