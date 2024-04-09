@@ -304,6 +304,7 @@ class PostServiceImplTest {
                 .description(TEST_DESCRIPTION)
                 .postedAt(createdAt)
                 .comments(new ArrayList<>())
+                .files(new ArrayList<>())
                 .build();
     }
 

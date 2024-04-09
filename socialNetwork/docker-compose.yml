@@ -12,5 +12,16 @@ services:
     volumes:
       - local_pgdata:/var/lib/postgresql/data
 
+  app:
+    image: social-network:latest
+    container_name: social-network-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/social-network
+      SPRING_DATASOURCE_USERNAME: bojana
+      SPRING_DATASOURCE_PASSWORD: password
+      SECRET_KEY: S5Ybr1gXoRfMjcBGHtdEkwTFc+y9diC7Vq+adfYQino=
+    ports:
+      - "8080:8080"
+
 volumes:
   local_pgdata:
