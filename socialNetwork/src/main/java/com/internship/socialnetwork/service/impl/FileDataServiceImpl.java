@@ -28,7 +28,7 @@ public class FileDataServiceImpl implements FileDataService {
             file.transferTo(new File(filePath));
             return fileDataRepository.save(buildFileDate(file, filePath, post));
         } catch (IOException ex) {
-            throw new FileUploadException("File upload failed!");
+            throw new FileUploadException("File upload failed: " + ex.getMessage());
         }
     }
 

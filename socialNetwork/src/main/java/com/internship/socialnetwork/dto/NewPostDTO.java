@@ -30,6 +30,8 @@ public class NewPostDTO {
                 .postedBy(user)
                 .description(newPostDTO.getDescription())
                 .postedAt(LocalDateTime.now())
+                .comments(List.of())
+                .files(List.of())
                 .build();
     }
 

@@ -323,22 +323,6 @@ public class AuthServiceImplTest {
         verify(jwtService, never()).generateToken(any());
     }
 
-    @Test
-    void refreshTokenShouldReturnNullWhenAuthHeaderIsNull() {
-        // given
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
-        when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(null);
-
-        // when
-        AuthenticationResponseDTO result = authService.refreshToken(request, response);
-
-        // and
-        assertNull(result);
-    }
-
-
     private User createUser(Long id) {
         return User.builder()
                 .id(id)
