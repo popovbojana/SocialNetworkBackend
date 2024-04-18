@@ -33,14 +33,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO create(NewUserDTO newUserDTO) {
         checkIfUserExists(newUserDTO);
-        return toUserDTO(userRepository.save(toUser(newUserDTO)));
+        return toUserDTO(userRepository.save(toUser(newUserDTO)), 0, 0);
     }
 
     @Override
     public List<UserDTO> getAllFriendsById(Long id) {
         return userRepository.findFriendsById(id)
                 .stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(id), getFriendsCount(id))))
                 .toList();
     }
 
@@ -52,13 +52,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO get(Long id) {
-        return toUserDTO(findById(id));
+        return toUserDTO(findById(id), getPostsCount(id), getFriendsCount(id));
     }
 
     @Override
     public UserDTO update(Long id, NewUserDTO updatedUser) {
         checkIfUserExists(id, updatedUser);
-        return toUserDTO(updateUser(findById(id), updatedUser));
+        return toUserDTO(updateUser(findById(id), updatedUser), getPostsCount(id), getFriendsCount(id));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> search(String username, String firstName, String lastName) {
         return userRepository.findByUsernameOrFirstNameOrLastName(username, firstName, lastName).stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(user.getId()), getFriendsCount(user.getId()))))
                 .toList();
     }
 
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> findConnectedUsers() {
         return userRepository.findAllByStatus(ONLINE).stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(user.getId()), getFriendsCount(user.getId()))))
                 .toList();
     }
 
@@ -146,6 +146,14 @@ public class UserServiceImpl implements UserService {
                 .status(ONLINE)
                 .phoneNumber(newUserDTO.getPhoneNumber())
                 .build();
+    }
+
+    private int getPostsCount(Long id) {
+        return userRepository.findPostsCountById(id);
+    }
+
+    private int getFriendsCount(Long id) {
+        return userRepository.findFriendsCountById(id);
     }
 
 }

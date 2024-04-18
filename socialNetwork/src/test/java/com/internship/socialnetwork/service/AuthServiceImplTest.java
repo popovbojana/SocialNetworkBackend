@@ -29,10 +29,10 @@ import static com.internship.socialnetwork.model.enumeration.Role.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -85,25 +85,25 @@ public class AuthServiceImplTest {
         // given
         User user = createUser(USER_ID);
         UserDetails userDetails = createUserDetails(user);
-        AuthenticationRequestDTO requestDTO = createAuthenticationRequest();
+        AuthenticationRequestDTO request = createAuthenticationRequest();
         AuthenticationResponseDTO response =  createAuthenticationResponse();
 
         when(authenticationManager.authenticate(any())).thenReturn(null);
         when(userService.findByUsername(any())).thenReturn(user);
         when(userDetailsService.loadUserByUsername(any())).thenReturn(userDetails);
-        when(jwtService.generateToken(any())).thenReturn(TOKEN);
+        when(jwtService.generateToken(any(), any())).thenReturn(TOKEN);
 
         // when
-        AuthenticationResponseDTO responseDTO = authService.login(requestDTO);
+        AuthenticationResponseDTO responseDTO = authService.login(request);
 
         // then
         assertEquals(response, responseDTO);
 
         // and
         verify(authenticationManager).authenticate(any());
-        verify(userService).findByUsername(any());
+        verify(userService, atLeastOnce()).findByUsername(any());
         verify(userDetailsService).loadUserByUsername(any());
-        verify(jwtService).generateToken(any());
+        verify(jwtService).generateToken(any(), any());
     }
 
     @Test

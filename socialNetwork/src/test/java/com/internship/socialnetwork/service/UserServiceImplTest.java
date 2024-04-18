@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
@@ -58,7 +59,7 @@ class UserServiceImplTest {
     void shouldReturnUser_whenCreate_ifUserDoesntExist() {
         // given
         NewUserDTO newUserDTO = createNewUserDTO();
-        User user = new User();
+        User user = createUser(USER_ID);
         UserDTO userDTO = new UserDTO();
 
         copyProperties(newUserDTO, user);
@@ -127,7 +128,7 @@ class UserServiceImplTest {
         // given
         User user = createUser(USER_ID);
         User friend = createUser(2L);
-        UserDTO friendDTO = toUserDTO(user);
+        UserDTO friendDTO = toUserDTO(user, 0, 0);
 
         when(userRepository.findFriendsById(any())).thenReturn(List.of(friend));
 
@@ -138,7 +139,7 @@ class UserServiceImplTest {
         assertEquals(List.of(friendDTO), foundFriends);
 
         // and
-        verify(userRepository).findFriendsById(any());
+        verify(userRepository, atLeastOnce()).findFriendsById(any());
     }
 
     @Test
@@ -179,7 +180,7 @@ class UserServiceImplTest {
     void shouldReturnUser_whenGet_ifUserExists() {
         // given
         User user = createUser(USER_ID);
-        UserDTO userDTO = toUserDTO(user);
+        UserDTO userDTO = toUserDTO(user, 0, 0);
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
 
@@ -211,7 +212,7 @@ class UserServiceImplTest {
         UserDTO updatedUserDTO = userService.update(USER_ID, updates);
 
         // then
-        assertEquals(toUserDTO(updatedUser), updatedUserDTO);
+        assertEquals(toUserDTO(updatedUser, 0, 0), updatedUserDTO);
 
         // and
         verify(userRepository).findById(any());
@@ -289,7 +290,7 @@ class UserServiceImplTest {
         List<UserDTO> foundUsers = userService.search(USERNAME, null, null);
 
         // then
-        assertEquals(List.of(toUserDTO(user)), foundUsers);
+        assertEquals(List.of(toUserDTO(user, 0, 0)), foundUsers);
 
         // and
         verify(userRepository).findByUsernameOrFirstNameOrLastName(any(), any(), any());
@@ -374,7 +375,7 @@ class UserServiceImplTest {
         // given
         User connectedUser = createUser(USER_ID);
         connectedUser.setStatus(ONLINE);
-        List<UserDTO> connectedUsers = List.of(toUserDTO(connectedUser));
+        List<UserDTO> connectedUsers = List.of(toUserDTO(connectedUser, 0, 0));
 
         when(userRepository.findAllByStatus(any())).thenReturn(List.of(connectedUser));
 
@@ -394,6 +395,7 @@ class UserServiceImplTest {
                 .email(EMAIL)
                 .username(USERNAME)
                 .password(PASSWORD)
+                .posts(List.of())
                 .role(USER)
                 .build();
     }
