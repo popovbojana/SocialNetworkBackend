@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -45,8 +47,9 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
         UserDetails userDetails = userDetailsService.loadUserByUsername(userService.findByUsername(requestUsername).getUsername());
+        Map<String, Object> claims = Map.of("id", userService.findByUsername(requestUsername).getId());
         return AuthenticationResponseDTO.builder()
-                .token(jwtService.generateToken(userDetails))
+                .token(jwtService.generateToken(claims, userDetails))
                 .refreshToken(jwtService.generateRefreshToken(userDetails))
                 .build();
     }
