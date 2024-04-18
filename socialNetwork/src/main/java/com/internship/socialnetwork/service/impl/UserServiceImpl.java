@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.service.impl;
 
+import com.internship.socialnetwork.dto.UpdateUserDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO update(Long id, NewUserDTO updatedUser) {
+    public UserDTO update(Long id, UpdateUserDTO updatedUser) {
         checkIfUserExists(id, updatedUser);
         return toUserDTO(updateUser(findById(id), updatedUser), getPostsCount(id), getFriendsCount(id));
     }
@@ -100,12 +101,11 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    private User updateUser(User user, NewUserDTO updatedUser) {
+    private User updateUser(User user, UpdateUserDTO updatedUser) {
         user.setEmail(updatedUser.getEmail());
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setUsername(updatedUser.getUsername());
-        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         return userRepository.save(user);
     }
@@ -121,16 +121,16 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private void checkIfUserExists(Long id, NewUserDTO newUserDTO) {
-        userRepository.findByEmail(newUserDTO.getEmail()).ifPresent(existingUser -> {
+    private void checkIfUserExists(Long id, UpdateUserDTO updatedUser) {
+        userRepository.findByEmail(updatedUser.getEmail()).ifPresent(existingUser -> {
             if (!existingUser.getId().equals(id)) {
-                throw new BadRequestException(String.format(USER_WITH_EMAIL_ALREADY_EXISTS_MESSAGE, newUserDTO.getEmail()));
+                throw new BadRequestException(String.format(USER_WITH_EMAIL_ALREADY_EXISTS_MESSAGE, updatedUser.getEmail()));
             }
         });
 
-        userRepository.findByUsername(newUserDTO.getUsername()).ifPresent(existingUser -> {
+        userRepository.findByUsername(updatedUser.getUsername()).ifPresent(existingUser -> {
             if (!existingUser.getId().equals(id)) {
-                throw new BadRequestException(String.format(USER_WITH_USERNAME_ALREADY_EXISTS_MESSAGE, newUserDTO.getUsername()));
+                throw new BadRequestException(String.format(USER_WITH_USERNAME_ALREADY_EXISTS_MESSAGE, updatedUser.getUsername()));
             }
         });
     }
