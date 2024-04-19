@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDTO {
 
+    private Long id;
+
     private String email;
 
     private String firstName;
@@ -28,6 +30,7 @@ public class UserDTO {
 
     public static UserDTO toUserDTO(User user, int postsCount, int friendsCount) {
         return UserDTO.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
