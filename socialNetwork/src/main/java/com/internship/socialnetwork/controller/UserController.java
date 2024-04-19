@@ -3,8 +3,8 @@ package com.internship.socialnetwork.controller;
 import com.internship.socialnetwork.dto.FriendRequestDTO;
 import com.internship.socialnetwork.dto.NewPostDTO;
 import com.internship.socialnetwork.dto.PostDTO;
+import com.internship.socialnetwork.dto.UpdateUserDTO;
 import com.internship.socialnetwork.dto.UserDTO;
-import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.model.ChatMessage;
 import com.internship.socialnetwork.model.enumeration.FriendRequestStatus;
 import com.internship.socialnetwork.service.ChatMessageService;
@@ -57,7 +57,7 @@ public class UserController {
 
     @PutMapping(value = "/{id}")
     @PreAuthorize("@authServiceImpl.hasAccess(#id)")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody NewUserDTO updatedUser) {
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UpdateUserDTO updatedUser) {
         return new ResponseEntity<>(userService.update(id, updatedUser), HttpStatus.OK);
     }
 

@@ -22,13 +22,19 @@ public class UserDTO {
 
     private String phoneNumber;
 
-    public static UserDTO toUserDTO(User user) {
+    private int postsCount;
+
+    private int friendsCount;
+
+    public static UserDTO toUserDTO(User user, int postsCount, int friendsCount) {
         return UserDTO.builder()
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
+                .postsCount(postsCount)
+                .friendsCount(friendsCount)
                 .build();
     }
 

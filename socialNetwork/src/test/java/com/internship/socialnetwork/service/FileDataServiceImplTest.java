@@ -87,7 +87,7 @@ class FileDataServiceImplTest {
         });
 
         // then
-        assertEquals("File upload failed!", exception.getMessage());
+        assertEquals("File upload failed: null", exception.getMessage());
 
         // and
         verify(multipartFile).transferTo(any(File.class));

@@ -1,5 +1,6 @@
 package com.internship.socialnetwork.service.impl;
 
+import com.internship.socialnetwork.dto.UpdateUserDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.dto.NewUserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
@@ -33,14 +34,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO create(NewUserDTO newUserDTO) {
         checkIfUserExists(newUserDTO);
-        return toUserDTO(userRepository.save(toUser(newUserDTO)));
+        return toUserDTO(userRepository.save(toUser(newUserDTO)), 0, 0);
     }
 
     @Override
     public List<UserDTO> getAllFriendsById(Long id) {
         return userRepository.findFriendsById(id)
                 .stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(id), getFriendsCount(id))))
                 .toList();
     }
 
@@ -52,13 +53,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO get(Long id) {
-        return toUserDTO(findById(id));
+        return toUserDTO(findById(id), getPostsCount(id), getFriendsCount(id));
     }
 
     @Override
-    public UserDTO update(Long id, NewUserDTO updatedUser) {
+    public UserDTO update(Long id, UpdateUserDTO updatedUser) {
         checkIfUserExists(id, updatedUser);
-        return toUserDTO(updateUser(findById(id), updatedUser));
+        return toUserDTO(updateUser(findById(id), updatedUser), getPostsCount(id), getFriendsCount(id));
     }
 
     @Override
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> search(String username, String firstName, String lastName) {
         return userRepository.findByUsernameOrFirstNameOrLastName(username, firstName, lastName).stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(user.getId()), getFriendsCount(user.getId()))))
                 .toList();
     }
 
@@ -96,16 +97,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> findConnectedUsers() {
         return userRepository.findAllByStatus(ONLINE).stream()
-                .map(UserDTO::toUserDTO)
+                .map((user -> UserDTO.toUserDTO(user, getPostsCount(user.getId()), getFriendsCount(user.getId()))))
                 .toList();
     }
 
-    private User updateUser(User user, NewUserDTO updatedUser) {
+    private User updateUser(User user, UpdateUserDTO updatedUser) {
         user.setEmail(updatedUser.getEmail());
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setUsername(updatedUser.getUsername());
-        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         return userRepository.save(user);
     }
@@ -121,16 +121,16 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private void checkIfUserExists(Long id, NewUserDTO newUserDTO) {
-        userRepository.findByEmail(newUserDTO.getEmail()).ifPresent(existingUser -> {
+    private void checkIfUserExists(Long id, UpdateUserDTO updatedUser) {
+        userRepository.findByEmail(updatedUser.getEmail()).ifPresent(existingUser -> {
             if (!existingUser.getId().equals(id)) {
-                throw new BadRequestException(String.format(USER_WITH_EMAIL_ALREADY_EXISTS_MESSAGE, newUserDTO.getEmail()));
+                throw new BadRequestException(String.format(USER_WITH_EMAIL_ALREADY_EXISTS_MESSAGE, updatedUser.getEmail()));
             }
         });
 
-        userRepository.findByUsername(newUserDTO.getUsername()).ifPresent(existingUser -> {
+        userRepository.findByUsername(updatedUser.getUsername()).ifPresent(existingUser -> {
             if (!existingUser.getId().equals(id)) {
-                throw new BadRequestException(String.format(USER_WITH_USERNAME_ALREADY_EXISTS_MESSAGE, newUserDTO.getUsername()));
+                throw new BadRequestException(String.format(USER_WITH_USERNAME_ALREADY_EXISTS_MESSAGE, updatedUser.getUsername()));
             }
         });
     }
@@ -146,6 +146,14 @@ public class UserServiceImpl implements UserService {
                 .status(ONLINE)
                 .phoneNumber(newUserDTO.getPhoneNumber())
                 .build();
+    }
+
+    private int getPostsCount(Long id) {
+        return userRepository.findPostsCountById(id);
+    }
+
+    private int getFriendsCount(Long id) {
+        return userRepository.findFriendsCountById(id);
     }
 
 }
