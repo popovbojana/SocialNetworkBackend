@@ -68,8 +68,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> search(String username, String firstName, String lastName) {
-        return userRepository.findByUsernameOrFirstNameOrLastName(username, firstName, lastName).stream()
+    public List<UserDTO> search(String search) {
+        return userRepository.searchForUsers(search).stream()
                 .map((user -> UserDTO.toUserDTO(user, getPostsCount(user.getId()), getFriendsCount(user.getId()))))
                 .toList();
     }

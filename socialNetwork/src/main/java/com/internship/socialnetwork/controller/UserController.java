@@ -48,11 +48,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String username,
-                                                @RequestParam(required = false) String firstName,
-                                                @RequestParam(required = false) String lastName) {
-        return new ResponseEntity<>(userService.search(username, firstName, lastName), HttpStatus.OK);
-
+    public ResponseEntity<List<UserDTO>> search(@RequestParam(required = false) String search) {
+        return new ResponseEntity<>(userService.search(search), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")
