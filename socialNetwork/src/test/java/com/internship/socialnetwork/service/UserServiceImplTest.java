@@ -1,6 +1,7 @@
 package com.internship.socialnetwork.service;
 
 import com.internship.socialnetwork.dto.NewUserDTO;
+import com.internship.socialnetwork.dto.UpdateUserDTO;
 import com.internship.socialnetwork.dto.UserDTO;
 import com.internship.socialnetwork.exception.BadRequestException;
 import com.internship.socialnetwork.exception.NotFoundException;
@@ -199,7 +200,7 @@ class UserServiceImplTest {
         // given
         String newUsername = "new_username";
         User user = createUser(USER_ID);
-        NewUserDTO updates = createNewUserDTO();
+        UpdateUserDTO updates = createUpdateUserDTO();
         updates.setUsername(newUsername);
         User updatedUser = createUser(USER_ID);
         updatedUser.setUsername(newUsername);
@@ -223,7 +224,7 @@ class UserServiceImplTest {
     @Test
     void shouldThrowBadRequestException_whenUpdate_ifUserWithEmailExists() {
         // given
-        NewUserDTO updates = createNewUserDTO();
+        UpdateUserDTO updates = createUpdateUserDTO();
         User otherUser = createUser(2L);
 
         when(userRepository.findByEmail(any())).thenReturn(Optional.of(otherUser));
@@ -244,7 +245,7 @@ class UserServiceImplTest {
     @Test
     void shouldThrowBadRequestException_whenUpdate_ifUserWithUsernameExists() {
         // given
-        NewUserDTO updates = createNewUserDTO();
+        UpdateUserDTO updates = createUpdateUserDTO();
         User otherUser = createUser(2L);
 
         when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
@@ -284,16 +285,16 @@ class UserServiceImplTest {
         // given
         User user = createUser(USER_ID);
 
-        when(userRepository.findByUsernameOrFirstNameOrLastName(any(), any(), any())).thenReturn(List.of(user));
+        when(userRepository.searchForUsers(any())).thenReturn(List.of(user));
 
         // when
-        List<UserDTO> foundUsers = userService.search(USERNAME, null, null);
+        List<UserDTO> foundUsers = userService.search(USERNAME);
 
         // then
         assertEquals(List.of(toUserDTO(user, 0, 0)), foundUsers);
 
         // and
-        verify(userRepository).findByUsernameOrFirstNameOrLastName(any(), any(), any());
+        verify(userRepository).searchForUsers(any());
     }
 
     @Test
@@ -405,6 +406,13 @@ class UserServiceImplTest {
                 .email(EMAIL)
                 .username(USERNAME)
                 .password(PASSWORD)
+                .build();
+    }
+
+    private UpdateUserDTO createUpdateUserDTO() {
+        return UpdateUserDTO.builder()
+                .email(EMAIL)
+                .username(USERNAME)
                 .build();
     }
 

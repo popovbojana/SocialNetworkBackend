@@ -37,7 +37,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE user.id = :id")
     int findPostsCountById(Long id);
 
-    List<User> findByUsernameOrFirstNameOrLastName(String username, String firstName, String lastName);
+    @Query("SELECT user FROM User user " +
+            "WHERE LOWER(user.username) LIKE LOWER(concat('%', :search, '%')) " +
+            "OR LOWER(user.firstName) LIKE LOWER(concat('%', :search, '%')) " +
+            "OR LOWER(user.lastName) LIKE LOWER(concat('%', :search, '%'))")
+    List<User> searchForUsers(String search);
 
     List<User> findAllByStatus(Status status);
 
