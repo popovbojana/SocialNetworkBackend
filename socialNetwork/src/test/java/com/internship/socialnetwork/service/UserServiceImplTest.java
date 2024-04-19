@@ -65,6 +65,7 @@ class UserServiceImplTest {
 
         copyProperties(newUserDTO, user);
         copyProperties(newUserDTO, userDTO);
+        userDTO.setId(USER_ID);
 
         when(userRepository.save(any())).thenReturn(user);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
@@ -129,7 +130,7 @@ class UserServiceImplTest {
         // given
         User user = createUser(USER_ID);
         User friend = createUser(2L);
-        UserDTO friendDTO = toUserDTO(user, 0, 0);
+        UserDTO friendDTO = toUserDTO(friend, 0, 0);
 
         when(userRepository.findFriendsById(any())).thenReturn(List.of(friend));
 
