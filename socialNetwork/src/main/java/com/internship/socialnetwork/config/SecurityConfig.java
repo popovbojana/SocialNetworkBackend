@@ -30,6 +30,7 @@ public class SecurityConfig {
                         req ->
                                 req
                                         .requestMatchers("/api/v1/auth/**").permitAll()
+                                        .requestMatchers("/api/v1/posts/*/files").permitAll()
                                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
