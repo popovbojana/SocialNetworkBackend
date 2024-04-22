@@ -64,7 +64,7 @@ public class PostController {
         return new ResponseEntity<>(postService.getAllCommentsForPost(id), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}/files", produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/{id}/files")
     public ResponseEntity<?> downloadFile(@PathVariable Long id) {
         return new ResponseEntity<>(fileDataService.downloadFile(id), HttpStatus.OK);
     }
