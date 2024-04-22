@@ -1,6 +1,7 @@
 package com.internship.socialnetwork.service.impl;
 
 import com.internship.socialnetwork.config.ApplicationConfig;
+import com.internship.socialnetwork.exception.BadRequestException;
 import com.internship.socialnetwork.exception.FileUploadException;
 import com.internship.socialnetwork.model.FileData;
 import com.internship.socialnetwork.model.Post;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,16 @@ public class FileDataServiceImpl implements FileDataService {
             return fileDataRepository.save(buildFileDate(file, filePath, post));
         } catch (IOException ex) {
             throw new FileUploadException("File upload failed: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] downloadFile(Long id) {
+        try {
+            FileData fileData = fileDataRepository.findByPostId(id).orElseThrow(() -> new BadRequestException(String.format("Post with id %d doesn't have a file!", id)));
+            return Files.readAllBytes(new File(fileData.getFilePath()).toPath());
+        } catch (IOException ex) {
+            throw new BadRequestException("Downloading file failed.");
         }
     }
 

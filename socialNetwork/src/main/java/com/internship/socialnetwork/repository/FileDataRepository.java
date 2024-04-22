@@ -11,4 +11,6 @@ public interface FileDataRepository extends JpaRepository<FileData, Long> {
 
     Optional<FileData> findByName(String fileName);
 
+    Optional<FileData> findByPostId(Long postId);
+
 }
