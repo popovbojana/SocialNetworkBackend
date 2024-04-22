@@ -17,24 +17,27 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostDTO {
 
+    private Long id;
+
     private Long userId;
 
     private String description;
 
     private String file;
 
-    private LocalDateTime postedAt;
+    private String postedAt;
 
     private List<CommentDTO> comments;
 
     public static PostDTO toPostDTO(Post post) {
         return PostDTO.builder()
+                .id(post.getId())
                 .userId(post.getPostedBy().getId())
                 .description(post.getDescription())
                 .file(Optional.ofNullable(post.getFile())
                         .map(FileData::getFilePath)
                         .orElse(null))
-                .postedAt(post.getPostedAt())
+                .postedAt(post.getPostedAt().toString())
                 .comments(post.getComments()
                         .stream()
                         .map(CommentDTO::toCommentDTO)
@@ -47,7 +50,7 @@ public class PostDTO {
                 .userId(post.getPostedBy().getId())
                 .description(post.getDescription())
                 .file(file.getFilePath())
-                .postedAt(post.getPostedAt())
+                .postedAt(post.getPostedAt().toString())
                 .comments(post.getComments()
                         .stream()
                         .map(CommentDTO::toCommentDTO)
