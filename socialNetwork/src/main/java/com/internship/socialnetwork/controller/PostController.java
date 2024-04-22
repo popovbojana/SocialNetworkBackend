@@ -5,10 +5,12 @@ import com.internship.socialnetwork.dto.NewCommentDTO;
 import com.internship.socialnetwork.dto.PostDTO;
 import com.internship.socialnetwork.dto.UpdatePostDTO;
 import com.internship.socialnetwork.service.CommentService;
+import com.internship.socialnetwork.service.FileDataService;
 import com.internship.socialnetwork.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +32,8 @@ public class PostController {
     private final PostService postService;
 
     private final CommentService commentService;
+
+    private final FileDataService fileDataService;
 
     @PostMapping(value = "/{id}/comments")
     @PreAuthorize("@authServiceImpl.hasAccess(#newCommentDTO.userId)")
@@ -58,6 +62,11 @@ public class PostController {
     @GetMapping(value = "/{id}/comments")
     public ResponseEntity<List<CommentDTO>> getAllCommentsForPost(@PathVariable Long id) {
         return new ResponseEntity<>(postService.getAllCommentsForPost(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/files", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<?> downloadFile(@PathVariable Long id) {
+        return new ResponseEntity<>(fileDataService.downloadFile(id), HttpStatus.OK);
     }
 
 }

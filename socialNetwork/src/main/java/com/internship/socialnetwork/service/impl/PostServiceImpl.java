@@ -13,12 +13,13 @@ import com.internship.socialnetwork.service.PostService;
 import com.internship.socialnetwork.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 import static com.internship.socialnetwork.dto.NewPostDTO.toPost;
 import static com.internship.socialnetwork.dto.PostDTO.toPostDTO;
-import static com.internship.socialnetwork.dto.PostDTO.toPostDTOWithFiles;
+import static com.internship.socialnetwork.dto.PostDTO.toPostDTOWithFile;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +36,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO create(Long userId, NewPostDTO newPostDTO) {
         Post post = postRepository.save(toPost(userService.findById(userId), newPostDTO));
-        if (newPostDTO.getFiles() != null) {
-            List<FileData> files = newPostDTO.getFiles().stream()
-                    .map(file -> fileDataService.create(file, post))
-                    .toList();
-            return toPostDTOWithFiles(post, files);
+        MultipartFile file = newPostDTO.getFile();
+        if (file != null) {
+            FileData fileData = fileDataService.create(file, post);
+            return toPostDTOWithFile(post, fileData);
         }
         return toPostDTO(post);
     }

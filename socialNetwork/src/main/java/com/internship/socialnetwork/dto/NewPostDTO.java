@@ -23,7 +23,7 @@ public class NewPostDTO {
     @Size(max = 1000, message = "can have maximum 1000 characters")
     private String description;
 
-    private List<MultipartFile> files;
+    private MultipartFile file;
 
     public static Post toPost(User user, NewPostDTO newPostDTO) {
         return Post.builder()
@@ -31,7 +31,6 @@ public class NewPostDTO {
                 .description(newPostDTO.getDescription())
                 .postedAt(LocalDateTime.now())
                 .comments(List.of())
-                .files(List.of())
                 .build();
     }
 

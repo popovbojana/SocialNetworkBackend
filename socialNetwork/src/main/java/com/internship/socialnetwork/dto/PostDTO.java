@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -20,7 +21,7 @@ public class PostDTO {
 
     private String description;
 
-    private List<String> files;
+    private String file;
 
     private LocalDateTime postedAt;
 
@@ -30,10 +31,9 @@ public class PostDTO {
         return PostDTO.builder()
                 .userId(post.getPostedBy().getId())
                 .description(post.getDescription())
-                .files(post.getFiles()
-                        .stream()
-                        .map(FileData::getName)
-                        .toList())
+                .file(Optional.ofNullable(post.getFile())
+                        .map(FileData::getFilePath)
+                        .orElse(null))
                 .postedAt(post.getPostedAt())
                 .comments(post.getComments()
                         .stream()
@@ -42,13 +42,11 @@ public class PostDTO {
                 .build();
     }
 
-    public static PostDTO toPostDTOWithFiles(Post post, List<FileData> files) {
+    public static PostDTO toPostDTOWithFile(Post post, FileData file) {
         return PostDTO.builder()
                 .userId(post.getPostedBy().getId())
                 .description(post.getDescription())
-                .files(files.stream()
-                        .map(FileData::getName)
-                        .toList())
+                .file(file.getFilePath())
                 .postedAt(post.getPostedAt())
                 .comments(post.getComments()
                         .stream()

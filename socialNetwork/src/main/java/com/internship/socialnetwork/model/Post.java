@@ -2,6 +2,7 @@ package com.internship.socialnetwork.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -38,8 +39,8 @@ public class Post {
     @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FileData> files;
+    @OneToOne(mappedBy = "post")
+    private FileData file;
 
     private LocalDateTime postedAt;
 
