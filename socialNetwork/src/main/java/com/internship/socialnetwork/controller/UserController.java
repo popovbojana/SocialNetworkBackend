@@ -98,4 +98,9 @@ public class UserController {
         return ResponseEntity.ok(chatMessageService.findChatMessages(senderId, recipientId));
     }
 
+    @GetMapping(value = "/{id}/friends-posts")
+    public ResponseEntity<List<PostDTO>> getAllFriendsPostsForUser(@PathVariable Long id) {
+        return new ResponseEntity<>(postService.getAllFriendsPostsForUser(id), HttpStatus.OK);
+    }
+
 }
