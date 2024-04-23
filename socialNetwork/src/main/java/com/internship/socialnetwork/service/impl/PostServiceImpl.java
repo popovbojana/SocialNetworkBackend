@@ -82,4 +82,11 @@ public class PostServiceImpl implements PostService {
                 .toList();
     }
 
+    @Override
+    public List<PostDTO> getAllFriendsPostsForUser(Long id) {
+        return postRepository.findFriendsPostsByUserId(id).stream()
+                .map(PostDTO::toPostDTO)
+                .toList();
+    }
+
 }

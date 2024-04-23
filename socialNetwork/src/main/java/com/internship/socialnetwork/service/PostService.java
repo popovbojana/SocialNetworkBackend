@@ -24,4 +24,6 @@ public interface PostService {
 
     List<CommentDTO> getAllCommentsForPost(Long id);
 
+    List<PostDTO> getAllFriendsPostsForUser(Long id);
+
 }
