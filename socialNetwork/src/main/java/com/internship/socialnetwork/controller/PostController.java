@@ -36,7 +36,7 @@ public class PostController {
     private final FileDataService fileDataService;
 
     @PostMapping(value = "/{id}/comments")
-    @PreAuthorize("@authServiceImpl.hasAccess(#newCommentDTO.userId)")
+//    @PreAuthorize("@authServiceImpl.hasAccess(#newCommentDTO.userId)")
     public ResponseEntity<CommentDTO> create(@PathVariable Long id, @Valid @RequestBody NewCommentDTO newCommentDTO) {
         return new ResponseEntity<>(commentService.create(id, newCommentDTO), HttpStatus.CREATED);
     }
